@@ -6,6 +6,7 @@ local Market=game:GetService('MarketplaceService')
 local Tween=game:GetService('TweenService')
 local player=Players.LocalPlayer
 local F=RS:WaitForChild('Underlayer'); local C=require(F.Config); local Visual=require(F.PetVisual)
+local Layout=require(F.Layout)
 local event=F:WaitForChild('Action'); local data=nil
 local gui=Instance.new('ScreenGui'); gui.Name='UnderlayerUI'; gui.ResetOnSpawn=false; gui.IgnoreGuiInset=false; gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling; gui.Parent=player:WaitForChild('PlayerGui')
 local palette={bg=Color3.fromRGB(20,23,28),panel=Color3.fromRGB(32,37,43),line=Color3.fromRGB(62,70,78),text=Color3.fromRGB(232,233,229),muted=Color3.fromRGB(158,166,172),accent=Color3.fromRGB(172,198,181),gold=Color3.fromRGB(226,191,126)}
@@ -33,7 +34,7 @@ local xpBar=frame(xpBack,UDim2.fromScale(0,1),UDim2.fromScale(0,0),palette.accen
 local toast=frame(gui,UDim2.new(.8,0,0,48),UDim2.new(.1,0,1,-155),palette.bg)
 local toastText=label(toast,UDim2.new(1,-24,1,0),UDim2.fromOffset(12,0),'',13)
 toast.Visible=false
-local help=label(gui,UDim2.fromOffset(310,30),UDim2.new(0,18,1,-98),'ЛКМ — копать    E — взаимодействовать',11,palette.muted)
+local help=label(gui,UDim2.fromOffset(310,30),UDim2.new(0,18,1,-98),'ЛКМ — копать    E — сдать    Shift — бег',11,palette.muted)
 local cross=label(gui,UDim2.fromOffset(18,18),UDim2.new(.5,-9,.5,-9),'·',24,palette.text); cross.TextXAlignment=Enum.TextXAlignment.Center
 local targetText=label(gui,UDim2.fromOffset(300,32),UDim2.new(.5,-150,.5,20),'',12); targetText.TextXAlignment=Enum.TextXAlignment.Center
 local nav=frame(gui,UDim2.fromOffset(330,40),UDim2.new(0,18,1,-60),palette.bg)
@@ -135,10 +136,10 @@ render=function(page)
   title.Text='Журнал экспедиции'
   for _,entry in ipairs({
    {'01 / ПЕРВАЯ СМЕНА','Спустись с лагеря к серой корке. Наведи курсор на блок и удерживай ЛКМ. На телефоне используй кнопку «Копать».'},
-   {'02 / РЕСУРСЫ','Рюкзак ограничен. Сдавай добычу у левого терминала в лагере. На выручку улучшай инструмент у правого верстака.'},
+   {'02 / РЕСУРСЫ','У каждого участка есть пункт сдачи. Инструменты улучшаются на верстаке в главном лагере. Shift — бег. Указатель под панелью ведёт к ближайшим раскопкам.'},
    {'03 / НЕ БУДИТЬ','Если под землёй раздаётся треск и появляется красный круг, отойди. Через 2,5 секунды случится выброс. При гибели теряется 25% несданного.'},
    {'04 / СПЯЩИЕ','Иногда под коркой прячутся малыши. Возьми найденного спутника с собой: он постепенно растёт до твоего уровня, пока ты раскапываешь залежи.'},
-   {'05 / ГЛУБИНА','Слои: пыль → камень → кристальная корка. После 90 общих очищенных блоков откроется древняя капсула. Каждый может получить её награду.'},
+   {'05 / ГЛУБИНА','Двенадцать участков на равнине 3072 × 3072. Слои: пыль → камень → корка. После 90 блоков капсула появится на первом участке.'},
    {'06 / ПЛАНЕТА ПОМНИТ','Внутри одного сервера раскопки общие. Раз в 10 минут возвращаются до трёх залежей. На новом сервере поверхность создаётся заново.'},
   }) do local r=row(136); label(r,UDim2.new(1,-24,0,32),UDim2.fromOffset(12,8),entry[1],16,palette.accent); label(r,UDim2.new(1,-24,0,86),UDim2.fromOffset(12,43),entry[2],14,palette.muted) end
  end
@@ -162,6 +163,11 @@ local function character(ch)
 end
 player.CharacterAdded:Connect(character); if player.Character then task.spawn(character,player.Character) end
 local holding=false; local target=nil; local lastDig=0; local mouse=player:GetMouse()
+local function sprint(on)
+ local h=player.Character and player.Character:FindFirstChildOfClass('Humanoid')
+ if h then h.WalkSpeed=on and 30 or 18 end
+end
+local route=label(gui,UDim2.fromOffset(310,34),UDim2.fromOffset(18,124),'',12,palette.muted)
 local function rayTarget()
  local cam=workspace.CurrentCamera; if not cam then return nil end
  local ray
@@ -179,11 +185,15 @@ local function rayTarget()
 end
 local selection=Instance.new('Highlight'); selection.FillColor=palette.accent; selection.FillTransparency=.84; selection.OutlineColor=palette.accent; selection.DepthMode=Enum.HighlightDepthMode.Occluded; selection.Parent=workspace.CurrentCamera
 UIS.InputBegan:Connect(function(input,processed)
+ if not processed and input.KeyCode==Enum.KeyCode.LeftShift then sprint(true) end
  if not processed and input.UserInputType==Enum.UserInputType.MouseButton1 then holding=true end
  if not processed and input.KeyCode==Enum.KeyCode.B then render('collection') end
 end)
-UIS.InputEnded:Connect(function(input) if input.UserInputType==Enum.UserInputType.MouseButton1 then holding=false end end)
-UIS.WindowFocusReleased:Connect(function() holding=false end)
+UIS.InputEnded:Connect(function(input)
+ if input.UserInputType==Enum.UserInputType.MouseButton1 then holding=false end
+ if input.KeyCode==Enum.KeyCode.LeftShift then sprint(false) end
+end)
+UIS.WindowFocusReleased:Connect(function() holding=false; sprint(false) end)
 local digButton=button(gui,UDim2.fromOffset(112,56),UDim2.new(1,-130,1,-132),'Копать',function() if not modal.Visible then local b=rayTarget(); if b then event:FireServer('dig',b) end end end)
 digButton.Visible=UIS.TouchEnabled
 local toastToken=0
@@ -204,10 +214,22 @@ event.OnClientEvent:Connect(function(action,payload)
   if modal.Visible and currentPage=='collection' then render('collection') elseif modal.Visible and currentPage=='shop' then render('shop') end
  end
 end)
-local accum=0
+local accum=0; local nextRoute=0
 Run.RenderStepped:Connect(function(dt)
  if previewModel and previewModel.Parent then spin=spin+dt*.4; previewModel:PivotTo(CFrame.Angles(0,spin,0)) end
  accum=accum+dt; if accum<.05 then return end; accum=0
+ if os.clock()>nextRoute then
+  nextRoute=os.clock()+.25
+  local r=player.Character and player.Character:FindFirstChild('HumanoidRootPart')
+  if r then
+   local nearest,dist=nil,math.huge
+   for _,zone in ipairs(Layout.Zones) do
+    local n=(r.Position-Vector3.new(zone.x,0,zone.z)).Magnitude
+    if n<dist then dist=n; nearest=zone end
+   end
+   route.Text=nearest and (nearest.name..' • '..math.floor(dist*.28)..' м') or ''
+  end
+ end
  target=not modal.Visible and rayTarget() or nil; selection.Adornee=target
  targetText.Text=target and (target.Name..'  '..tostring(target:GetAttribute('HP'))..' / '..tostring(target:GetAttribute('MaxHP'))) or ''
  if holding and not modal.Visible and target and os.clock()-lastDig>.36 then lastDig=os.clock(); event:FireServer('dig',target) end

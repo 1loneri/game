@@ -26,7 +26,10 @@ local mt={__index=function(t,k)
  if k=='CFrame' then local p=t._props.Position; if p then return cf(p.X,p.Y,p.Z) end; return cf() end
  return t._props[k]
 end,__newindex=function(t,k,v)
- if k=='Parent' then if v then table.insert(v._children,t) end; rawset(t,'_parent',v) else t._props[k]=v end
+ if k=='Parent' then
+  local old=rawget(t,'_parent')
+  if old then for i,child in ipairs(old._children) do if child==t then table.remove(old._children,i); break end end end
+  if v then table.insert(v._children,t) end; rawset(t,'_parent',v) else t._props[k]=v end
 end}
 function methods:FindFirstChild(name)
  for _,v in ipairs(self._children) do if v.Name==name then return v end end
@@ -51,6 +54,8 @@ local function json(x)
  for k,v in pairs(x) do table.insert(parts,escape(tostring(k))..':'..json(v)) end
  return '{'..table.concat(parts,',')..'}'
 end
+script={Parent={Layout='layout'}}
+require=function(ref) assert(ref=='layout'); return assert(loadfile(WORLD_LAYOUT))() end
 local W=assert(loadfile(WORLD_SOURCE))(); local result=W.Build()
 local reused=W.Build(); assert(reused.Root==result.Root and reused.Sell==result.Sell and reused.Upgrade==result.Upgrade,'Prebuilt world was replaced')
 local function export(node)

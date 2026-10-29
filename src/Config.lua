@@ -1,5 +1,5 @@
 local C = {}
-C.Version = 2
+C.Version = 3
 C.StudioPersistence = false -- Play работает без публикации и API-доступа; true только для теста DataStore
 C.SaveName = 'Underlayer_v1'
 C.HelpPass = 0 -- game pass: автоматическая помощь выбранных малышей

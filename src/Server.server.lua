@@ -6,6 +6,7 @@ local Run=game:GetService('RunService')
 local Tween=game:GetService('TweenService')
 local F=RS:WaitForChild('Underlayer')
 local C=require(F.Config); local Visual=require(F.PetVisual)
+local Layout=require(script.Parent.Layout)
 -- Visible world must never depend on persistence initialization.
 local world=require(script.Parent.World).Build()
 local Profile=require(script.Parent.Profile)
@@ -84,7 +85,7 @@ local function hazard(position)
 end
 local function makeBlock(x,z,layer)
  local b=Instance.new('Part'); b.Name='Слой '..layer
- b.Size=Vector3.new(6.8,2.5,6.8); b.Position=Vector3.new(x,4.25-(layer-1)*2.5,z)
+ b.Size=Vector3.new(Layout.BlockSize,2.5,Layout.BlockSize); b.Position=Vector3.new(x,Layout.LayerY(layer),z)
  b.Color=({Color3.fromRGB(97,101,109),Color3.fromRGB(75,86,100),Color3.fromRGB(86,75,106)})[layer]
  b.Material=layer==1 and Enum.Material.Sand or Enum.Material.Slate
  b.Anchored=true; b:SetAttribute('Layer',layer); b:SetAttribute('HP',layer+1); b:SetAttribute('MaxHP',layer+1)
@@ -93,11 +94,16 @@ local function makeBlock(x,z,layer)
  b.Parent=blocks
 end
 if #blocks:GetChildren()==0 then
- for ix=-6,6 do for iz=0,17 do for layer=1,3 do makeBlock(ix*7,iz*7,layer) end end end
+ for _,zone in ipairs(Layout.Zones) do
+  for ix=0,Layout.PatchCells-1 do for iz=0,Layout.PatchCells-1 do for layer=1,3 do
+   local x,z=zone.x-64+8+ix*Layout.BlockSize,zone.z-64+8+iz*Layout.BlockSize
+   if not (math.abs(x-zone.x)<16 and z>=zone.z+32) then makeBlock(x,z,layer) end
+  end end end
+ end
 else
  for _,b in ipairs(blocks:GetChildren()) do
   if b:IsA('BasePart') then
-   local layer=math.clamp(math.floor((4.25-b.Position.Y)/2.5+.5)+1,1,3)
+   local layer=math.clamp(math.floor((Layout.LayerY(1)-b.Position.Y)/2.5+.5)+1,1,3)
    b.Name='Слой '..layer; b:SetAttribute('Layer',layer); b:SetAttribute('HP',layer+1); b:SetAttribute('MaxHP',layer+1)
    b:SetAttribute('Hazard',rng:NextNumber()<.085); b:SetAttribute('Find',rng:NextNumber()<.075)
   end
@@ -148,7 +154,7 @@ local function dig(p,b,auto)
  if cleared==90 then
   for _,pl in ipairs(Players:GetPlayers()) do tell(pl,'Под коркой обнаружена древняя капсула. Центральный сектор изменился.') end
   local capsule=Instance.new('Part'); capsule.Name='AncientCapsule'; capsule.Shape=Enum.PartType.Ball
-  capsule.Size=Vector3.new(9,13,9); capsule.Position=Vector3.new(0,1,63); capsule.Material=Enum.Material.Neon
+  capsule.Size=Vector3.new(9,13,9); capsule.Position=Vector3.new(Layout.Zones[1].x,1,Layout.Zones[1].z); capsule.Material=Enum.Material.Neon
   capsule.Color=Color3.fromRGB(126,137,184); capsule.Anchored=true; capsule.Parent=world.Root
   local prompt=Instance.new('ProximityPrompt'); prompt.ActionText='Освободить малыша'; prompt.ObjectText='Древняя капсула'; prompt.HoldDuration=2; prompt.MaxActivationDistance=13; prompt.Parent=capsule
   local claimed={}
@@ -162,11 +168,17 @@ local function dig(p,b,auto)
  end
  sync(p)
 end
-world.Sell.Triggered:Connect(function(p)
- local d=state(p); local root=rootOf(p)
- if not d or not root or (root.Position-world.Sell.Parent.Position).Magnitude>16 then return end
- local amount=d.bag; d.coins=d.coins+amount*2; d.bag=0; sync(p); tell(p,'Сдано '..amount..' ресурсов • +'..(amount*2)..' монет')
-end)
+local function connectDepot(prompt)
+ prompt.Triggered:Connect(function(p)
+  local d=state(p); local root=rootOf(p)
+  if not d or not root or (root.Position-prompt.Parent.Position).Magnitude>16 then return end
+  local amount=d.bag; d.coins=d.coins+amount*2; d.bag=0
+  sync(p); tell(p,'Сдано '..amount..' ресурсов • +'..(amount*2)..' монет')
+ end)
+end
+for _,obj in ipairs(world.Root:GetDescendants()) do
+ if obj:IsA('ProximityPrompt') and obj.Name=='SellPrompt' then connectDepot(obj) end
+end
 world.Upgrade.Triggered:Connect(function(p)
  local d=state(p); local root=rootOf(p)
  if not d or not root or (root.Position-world.Upgrade.Parent.Position).Magnitude>16 then return end
@@ -221,7 +233,8 @@ local function onPlayer(p)
  local function character(ch)
   local hum=ch:WaitForChild('Humanoid'); hum.WalkSpeed=18
   local root=ch:WaitForChild('HumanoidRootPart')
-  root.CFrame=CFrame.new(0,8,-45)
+  local spawn=world.Root:FindFirstChild('CampSpawn')
+  root.CFrame=spawn and CFrame.new(spawn.Position+Vector3.new(0,4,0)) or CFrame.new(0,6,Layout.CampZ)
   hum.Died:Connect(function()
    local live=Profile.Live[p]
    if not live then return end

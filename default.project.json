@@ -12,6 +12,9 @@
         "PetVisual": {
           "$path": "src/PetVisual.lua"
         },
+        "Layout": {
+          "$path": "src/Layout.lua"
+        },
         "Action": {
           "$className": "RemoteEvent"
         }
@@ -24,6 +27,9 @@
       },
       "World": {
         "$path": "src/World.lua"
+      },
+      "Layout": {
+        "$path": "src/Layout.lua"
       },
       "Profile": {
         "$path": "src/Profile.lua"

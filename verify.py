@@ -90,12 +90,12 @@ print('PASS profile: save, receipt deduplication, release, lease collision, outa
 print('PASS regression: unpublished GetDataStore failure; default Studio avoids service acquisition; live server fails closed')
 root=ET.parse(ROOT/'Underlayer.rbxlx').getroot()
 scripts={i.find("Properties/string[@name='Name']").text:i for i in root.iter('Item') if i.get('class') in ('Script','LocalScript','ModuleScript')}
-assert len(scripts)==6
-mapping={'Config':'Config.lua','PetVisual':'PetVisual.lua','Profile':'Profile.lua','World':'World.lua','UnderlayerServer':'Server.server.lua','UnderlayerClient':'Client.client.lua'}
+assert len(scripts)==7
+mapping={'Config':'Config.lua','PetVisual':'PetVisual.lua','Profile':'Profile.lua','World':'World.lua','Layout':'Layout.lua','UnderlayerServer':'Server.server.lua','UnderlayerClient':'Client.client.lua'}
 for name,path in mapping.items():
  assert scripts[name].find("Properties/ProtectedString[@name='Source']").text==(ROOT/'src'/path).read_text()
 assert len({i.get('referent') for i in root.iter('Item')})==len(list(root.iter('Item')))
-print('PASS place: XML, six source matches, unique referents')
+print('PASS place: XML, seven distinct source matches, unique referents')
 
 workspace=next(i for i in root.findall('Item') if i.get('class')=='Workspace')
 world=workspace.find("Item/Properties/string[.='UnderlayerWorld']/../..")
@@ -111,10 +111,39 @@ for part in parts:
  assert part.find("Properties/CoordinateFrame[@name='CFrame']") is not None
  assert part.find("Properties/Color3uint8[@name='Color3uint8']") is not None or part.get('class')=='SpawnLocation'
 deposits=next(i for i in world.findall('Item') if i.find("Properties/string[@name='Name']").text=='Deposits')
-assert len(deposits.findall('Item'))==702
+assert len(deposits.findall('Item'))==2160
 server=(ROOT/'src/Server.server.lua').read_text()
 assert server.index("require(script.Parent.World).Build()")<server.index("require(script.Parent.Profile)")
-print('PASS regression: prebuilt world has',len(parts),'anchored parts, spawn, transforms and 702 deposits; map starts before profiles')
+print('PASS regression: prebuilt world has',len(parts),'anchored parts, spawn, transforms and 2160 deposits; map starts before profiles')
 
 assert workspace.find("Item[@class='Camera']/Properties/token[@name='CameraType']").text=='5'
 print('PASS camera: default Custom mode and explicit humanoid subject on spawn')
+
+layout_source=f"""
+local L=assert(loadfile('{ROOT}/src/Layout.lua'))()
+assert(L.Size==3072 and #L.Zones==12)
+local extent=L.PatchCells*L.BlockSize/2
+for _,zone in ipairs(L.Zones) do
+ assert(math.abs(zone.x)+extent<L.Size/2 and math.abs(zone.z)+extent<L.Size/2)
+ assert(L.InPatch(zone.x,zone.z))
+ assert(not L.InPatch(zone.x+extent+1,zone.z))
+end
+assert(L.LayerY(1)==-1.25 and L.LayerY(3)==-6.25)
+"""
+execute(layout_source,'layout-contract',True)
+names=[i.find("Properties/string[@name='Name']").text for i in world.iter('Item')]
+assert names.count('LunarRegolith')==2256
+assert len([n for n in names if n.startswith('FieldDepot')])==12
+assert names.count('HorizonMassif')==96
+assert len([n for n in names if n.startswith('CraterRim')])>300
+assert names.count('EscapeStep')==72
+# The route out of every pit is physically empty of mineable columns.
+for part in deposits.findall('Item'):
+ cf=part.find("Properties/CoordinateFrame[@name='CFrame']")
+ x,z=float(cf.find('X').text),float(cf.find('Z').text)
+ for zx,zz in [(0,-1024),(448,-896),(-512,-832),(960,-448),(-1088,-320),(128,-384),(448,192),(-384,256),(1088,576),(-1088,768),(0,1024),(768,1152)]:
+  assert not (abs(x-zx)<16 and zz+32<=z<zz+64)
+print('PASS lunar map: 3072-square plain, 12 depots, distant massifs, crater rims and unobstructed exit steps')
+
+assert workspace.find("Properties/bool[@name='StreamingEnabled']").text=="true"
+print("PASS streaming: large-world client streaming enabled")

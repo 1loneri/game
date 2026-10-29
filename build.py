@@ -17,7 +17,7 @@ def capture_scene():
     lib.lua_close.argtypes=[ctypes.c_void_p]
     with tempfile.TemporaryDirectory() as temp:
         dest=Path(temp)/'scene.json'
-        code=(f'WORLD_SOURCE={json.dumps(str(BASE/"src/World.lua"))}\nWORLD_OUTPUT={json.dumps(str(dest))}\n'+(BASE/'tools/capture_world.lua').read_text()).encode()
+        code=(f'WORLD_LAYOUT={json.dumps(str(BASE/"src/Layout.lua"))}\nWORLD_SOURCE={json.dumps(str(BASE/"src/World.lua"))}\nWORLD_OUTPUT={json.dumps(str(dest))}\n'+(BASE/'tools/capture_world.lua').read_text()).encode()
         state=lib.luaL_newstate(); lib.luaL_openlibs(state)
         status=lib.luaL_loadbufferx(state,code,len(code),b'world-capture',None)
         if status==0: status=lib.lua_pcallk(state,0,0,0,0,None)
@@ -43,7 +43,7 @@ TOKENS={'Enum.Material.Slate':800,'Enum.Material.Sand':1296,'Enum.Material.Metal
 def prop(el,name,value):
     ps=el.find('Properties')
     if isinstance(value,bool): ET.SubElement(ps,'bool',{'name':name}).text=str(value).lower()
-    elif isinstance(value,(int,float)): ET.SubElement(ps,'float',{'name':name}).text=str(value)
+    elif isinstance(value,(int,float)): ET.SubElement(ps,'int' if name=='StarCount' else 'float',{'name':name}).text=str(value)
     elif isinstance(value,str):
         if value.startswith('Enum.'):
             assert value in TOKENS, value
@@ -72,6 +72,8 @@ def prop(el,name,value):
 def node(parent,desc):
     values=desc['properties']; el=item(parent,desc['class'],values.get('Name',desc['class']))
     for key,value in values.items():
+        if desc['class']=='Sky' and key.startswith('Skybox'):
+            content=ET.SubElement(el.find('Properties'),'Content',{'name':key}); ET.SubElement(content,'null'); continue
         if key in ('Name','Position') or (key=='CFrame' and value is None): continue
         if key=='ClockTime' and desc['class']=='Lighting':
             prop(el,'TimeOfDay',f'{int(value):02d}:{round((value%1)*60):02d}:00'); continue
@@ -89,31 +91,23 @@ def node(parent,desc):
     return el
 
 workspace=item(root,'Workspace','Workspace')
+prop(workspace,'StreamingEnabled',True)
+for name,value in [('StreamingMinRadius',128),('StreamingTargetRadius',512)]:
+    ET.SubElement(workspace.find('Properties'),'int',{'name':name}).text=str(value)
 scene=capture_scene()
 world=node(workspace,scene['world'])
-deposits=item(world,'Folder','Deposits')
-for ix in range(-6,7):
-    for iz in range(18):
-        for layer in range(1,4):
-            p=item(deposits,'Part',f'Layer{layer}')
-            prop(p,'size',{'_type':'Vector3','X':6.8,'Y':2.5,'Z':6.8})
-            prop(p,'CFrame',{'_type':'CFrame','X':ix*7,'Y':4.25-(layer-1)*2.5,'Z':iz*7,'R':[1,0,0,0,1,0,0,0,1]})
-            rgb=[(97,101,109),(75,86,100),(86,75,106)][layer-1]
-            ET.SubElement(p.find('Properties'),'Color3uint8',{'name':'Color3uint8'}).text=str(0xff000000 | rgb[0]<<16 | rgb[1]<<8 | rgb[2])
-            prop(p,'Anchored',True); prop(p,'Material','Enum.Material.Sand' if layer==1 else 'Enum.Material.Slate')
-            prop(p,'TopSurface','Enum.SurfaceType.Smooth'); prop(p,'BottomSurface','Enum.SurfaceType.Smooth')
 rs=item(root,'ReplicatedStorage','ReplicatedStorage'); f=item(rs,'Folder','Underlayer'); item(f,'RemoteEvent','Action')
-for name in ['Config','PetVisual']: item(f,'ModuleScript',name,(BASE/'src'/f'{name}.lua').read_text())
+for name in ['Config','PetVisual','Layout']: item(f,'ModuleScript',name,(BASE/'src'/f'{name}.lua').read_text())
 sss=item(root,'ServerScriptService','ServerScriptService')
-for name in ['Profile','World']: item(sss,'ModuleScript',name,(BASE/'src'/f'{name}.lua').read_text())
+for name in ['Profile','World','Layout']: item(sss,'ModuleScript',name,(BASE/'src'/f'{name}.lua').read_text())
 item(sss,'Script','UnderlayerServer',(BASE/'src/Server.server.lua').read_text())
-sp=item(root,'StarterPlayer','StarterPlayer'); sps=item(sp,'StarterPlayerScripts','StarterPlayerScripts')
+sp=item(root,'StarterPlayer','StarterPlayer'); prop(sp,'EnableMouseLockOption',False); sps=item(sp,'StarterPlayerScripts','StarterPlayerScripts')
 item(sps,'LocalScript','UnderlayerClient',(BASE/'src/Client.client.lua').read_text())
 node(root,scene['lighting']); item(root,'StarterGui','StarterGui')
 # Initial editor camera looks from behind camp towards the excavation.
 cam=item(workspace,'Camera','Camera')
 # Build an orthonormal look-at matrix; -Z points toward target.
-eye=(78,65,-115); target=(0,0,30)
+eye=(340,380,-1650); target=(0,0,-1000)
 def norm(v):
     length=math.sqrt(sum(x*x for x in v)); return tuple(x/length for x in v)
 def cross(a,b): return (a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
@@ -122,10 +116,10 @@ rot=[right[i] if j==0 else up[i] if j==1 else back[i] for i in range(3) for j in
 prop(cam,'CFrame',{'_type':'CFrame','X':eye[0],'Y':eye[1],'Z':eye[2],'R':rot})
 ET.SubElement(cam.find('Properties'),'token',{'name':'CameraType'}).text='5'
 ET.SubElement(workspace.find('Properties'),'Ref',{'name':'CurrentCamera'}).text=cam.get('referent')
-ET.indent(root)
+# Compact XML keeps a larger prebuilt lunar map practical to download.
 ET.ElementTree(root).write(BASE/'Underlayer.rbxlx',encoding='utf-8',xml_declaration=True)
 # Rojo keeps World.Build as a fallback for source-only syncs.
-project={'name':'Underlayer','tree':{'$className':'DataModel','ReplicatedStorage':{'$className':'ReplicatedStorage','Underlayer':{'$className':'Folder','Config':{'$path':'src/Config.lua'},'PetVisual':{'$path':'src/PetVisual.lua'},'Action':{'$className':'RemoteEvent'}}},'ServerScriptService':{'$className':'ServerScriptService','UnderlayerServer':{'$path':'src/Server.server.lua'},'World':{'$path':'src/World.lua'},'Profile':{'$path':'src/Profile.lua'}},'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':{'$className':'StarterPlayerScripts','UnderlayerClient':{'$path':'src/Client.client.lua'}}}}}
+project={'name':'Underlayer','tree':{'$className':'DataModel','ReplicatedStorage':{'$className':'ReplicatedStorage','Underlayer':{'$className':'Folder','Config':{'$path':'src/Config.lua'},'PetVisual':{'$path':'src/PetVisual.lua'},'Layout':{'$path':'src/Layout.lua'},'Action':{'$className':'RemoteEvent'}}},'ServerScriptService':{'$className':'ServerScriptService','UnderlayerServer':{'$path':'src/Server.server.lua'},'World':{'$path':'src/World.lua'},'Layout':{'$path':'src/Layout.lua'},'Profile':{'$path':'src/Profile.lua'}},'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':{'$className':'StarterPlayerScripts','UnderlayerClient':{'$path':'src/Client.client.lua'}}}}}
 (BASE/'default.project.json').write_text(json.dumps(project,indent=2))
 print('Built visible world:',sum(1 for i in world.iter('Item') if i.get('class') in ('Part','SpawnLocation')),'physical parts')
 print(BASE/'Underlayer.rbxlx')
