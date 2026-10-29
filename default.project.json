@@ -1,0 +1,42 @@
+{
+  "name": "Underlayer",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Underlayer": {
+        "$className": "Folder",
+        "Config": {
+          "$path": "src/Config.lua"
+        },
+        "PetVisual": {
+          "$path": "src/PetVisual.lua"
+        },
+        "Action": {
+          "$className": "RemoteEvent"
+        }
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "UnderlayerServer": {
+        "$path": "src/Server.server.lua"
+      },
+      "World": {
+        "$path": "src/World.lua"
+      },
+      "Profile": {
+        "$path": "src/Profile.lua"
+      }
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "UnderlayerClient": {
+          "$path": "src/Client.client.lua"
+        }
+      }
+    }
+  }
+}

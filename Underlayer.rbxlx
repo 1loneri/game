@@ -1,0 +1,796 @@
+<?xml version='1.0' encoding='utf-8'?>
+<roblox version="4" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd">
+  <External>null</External>
+  <External>nil</External>
+  <Item class="Workspace" referent="RBX1">
+    <Properties>
+      <string name="Name">Workspace</string>
+    </Properties>
+  </Item>
+  <Item class="ReplicatedStorage" referent="RBX2">
+    <Properties>
+      <string name="Name">ReplicatedStorage</string>
+    </Properties>
+    <Item class="Folder" referent="RBX3">
+      <Properties>
+        <string name="Name">Underlayer</string>
+      </Properties>
+      <Item class="RemoteEvent" referent="RBX4">
+        <Properties>
+          <string name="Name">Action</string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="RBX5">
+        <Properties>
+          <string name="Name">Config</string>
+          <ProtectedString name="Source">local C = {}
+C.Version = 1
+C.SaveName = 'Underlayer_v1'
+C.HelpPass = 0 -- game pass: автоматическая помощь выбранных малышей
+C.SlotsPass = 0 -- game pass: всего три активных спутника вместо одного
+C.EggProduct = 0 -- developer product: одно яйцо
+C.DirectProducts = {Nova=0, Umbra=0, Sol=0} -- developer products: конкретный малыш
+C.EggOdds = {{id='Nova',chance=60},{id='Umbra',chance=30},{id='Sol',chance=10}}
+C.Pets = {
+ Dust={name='Пылик',color=Color3.fromRGB(172,183,189),kind='fluff',premium=false},
+ Moss={name='Мохлик',color=Color3.fromRGB(124,175,145),kind='sprout',premium=false},
+ Crystal={name='Кристик',color=Color3.fromRGB(133,191,208),kind='crystal',premium=false},
+ Nova={name='Нова',color=Color3.fromRGB(184,148,240),kind='star',premium=true},
+ Umbra={name='Умбра',color=Color3.fromRGB(106,134,198),kind='horns',premium=true},
+ Sol={name='Сол',color=Color3.fromRGB(246,189,113),kind='sun',premium=true},
+}
+C.Tools = {
+ {name='Щётка',cost=0,power=1,capacity=50},
+ {name='Скребок',cost=140,power=2,capacity=100},
+ {name='Бур',cost=650,power=4,capacity=200},
+}
+function C.Level(xp) return math.floor(math.sqrt(math.max(0,xp)/45))+1 end
+function C.Stage(growth)
+ if growth&gt;=50 then return 5 elseif growth&gt;=30 then return 4 elseif growth&gt;=15 then return 3 elseif growth&gt;=6 then return 2 end
+ return 1
+end
+return C
+</ProtectedString>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="RBX6">
+        <Properties>
+          <string name="Name">PetVisual</string>
+          <ProtectedString name="Source">local V = {}
+function V.Build(id, def, growth)
+ local model=Instance.new('Model'); model.Name=id
+ local scale=0.48+math.min(growth,50)/50*0.85
+ local function ball(name,size,pos,color,material)
+  local p=Instance.new('Part'); p.Name=name; p.Shape=Enum.PartType.Ball
+  p.Size=size*scale; p.CFrame=CFrame.new(pos*scale); p.Color=color
+  p.Material=material or Enum.Material.SmoothPlastic
+  p.Anchored=true; p.CanCollide=false; p.CanTouch=false; p.CanQuery=false; p.CastShadow=false
+  p.Parent=model; return p
+ end
+ local body=ball('Body',Vector3.new(2.5,2.1,2.4),Vector3.zero,def.color)
+ model.PrimaryPart=body
+ local dark=Color3.fromRGB(18,26,33)
+ for _,x in ipairs({-0.56,0.56}) do
+  ball('Eye',Vector3.new(.32,.46,.24),Vector3.new(x,.15,-1.08),dark)
+  ball('Glint',Vector3.new(.1,.12,.08),Vector3.new(x-.04,.25,-1.2),Color3.new(1,1,1),Enum.Material.Neon)
+  ball('Foot',Vector3.new(.7,.45,.8),Vector3.new(x,-.9,-.25),def.color:Lerp(dark,.15))
+ end
+ ball('Mouth',Vector3.new(.22,.11,.12),Vector3.new(0,-.3,-1.18),dark)
+ local count=math.min(5,1+math.floor(growth/10))
+ if def.kind=='sprout' then
+  for i=1,count do ball('Leaf',Vector3.new(.65,1.1,.35),Vector3.new((i-(count+1)/2)*.35,1.25,0),Color3.fromRGB(88,164,118)) end
+ elseif def.kind=='crystal' or def.kind=='star' or def.kind=='sun' then
+  for i=1,count do
+   local p=ball('Crystal',Vector3.new(.4,.6+i*.15,.4),Vector3.new((i-(count+1)/2)*.4,1.1,0),def.color:Lerp(Color3.new(1,1,1),.4),Enum.Material.Neon)
+   p.Shape=Enum.PartType.Block; p.CFrame=p.CFrame*CFrame.Angles(0,0,.35)
+  end
+ else
+  for _,x in ipairs({-1,1}) do ball('Ear',Vector3.new(.65,.8+growth*.025,.7),Vector3.new(x,.95,.2),def.color) end
+ end
+ if growth&gt;=15 then ball('Tail',Vector3.new(.8,1,1.4),Vector3.new(0,-.1,1.4),def.color) end
+ if growth&gt;=30 then
+  for _,x in ipairs({-1.25,1.25}) do ball('Fin',Vector3.new(.6,1.1,1.3),Vector3.new(x,.1,.5),def.color:Lerp(Color3.new(1,1,1),.2)) end
+ end
+ local gui=Instance.new('BillboardGui'); gui.Size=UDim2.fromOffset(160,32); gui.StudsOffset=Vector3.new(0,2.2*scale,0); gui.MaxDistance=45; gui.Parent=body
+ local label=Instance.new('TextLabel'); label.Size=UDim2.fromScale(1,1); label.BackgroundTransparency=1; label.Text=def.name
+ label.Font=Enum.Font.GothamMedium; label.TextSize=13; label.TextColor3=Color3.fromRGB(226,237,231); label.TextStrokeTransparency=.4; label.Parent=gui
+ return model
+end
+return V
+</ProtectedString>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="RBX7">
+    <Properties>
+      <string name="Name">ServerScriptService</string>
+    </Properties>
+    <Item class="ModuleScript" referent="RBX8">
+      <Properties>
+        <string name="Name">Profile</string>
+        <ProtectedString name="Source">-- Session lease + serialized writes. Studio can run offline; purchases cannot.
+local DSS=game:GetService('DataStoreService')
+local Run=game:GetService('RunService')
+local Http=game:GetService('HttpService')
+local C=require(game.ReplicatedStorage.Underlayer.Config)
+local store=DSS:GetDataStore(C.SaveName)
+local owner=game.JobId~='' and game.JobId or Http:GenerateGUID(false)
+local P={}; P.Live={}
+local function copy(x)
+ if type(x)~='table' then return x end
+ local y={}; for k,v in pairs(x) do y[k]=copy(v) end; return y
+end
+local function fresh()
+ return {coins=0,xp=0,bag=0,tool=1,pets={Dust={growth=1,fragments=0}},equipped={'Dust'},eggs=0,receipts={}}
+end
+function P.Load(player)
+ local success, record=pcall(function()
+  return store:UpdateAsync('u'..player.UserId,function(old)
+   old=old or {data=fresh()}
+   if old.owner and old.owner~=owner and (old.lease or 0)&gt;os.time() then return nil end
+   old.owner=owner; old.lease=os.time()+180; return old
+  end)
+ end)
+ if success and not record then return nil,'Твой профиль ещё открыт на другом сервере. Попробуй через минуту.' end
+ if not success and not Run:IsStudio() then return nil,'Не удалось загрузить сохранение. Попробуй снова позже.' end
+ local state={data=success and record.data or fresh(),busy=false,offline=not success,owner=owner}
+ local d=state.data; d.receipts=d.receipts or {}; d.eggs=d.eggs or 0
+ P.Live[player]=state
+ return state
+end
+function P.Commit(player, transform, release)
+ local s=P.Live[player]; if not s or s.busy then return false end
+ if s.offline then return false end
+ s.busy=true
+ local snapshot=copy(s.data)
+ local ok,result=pcall(function()
+  return store:UpdateAsync('u'..player.UserId,function(old)
+   if not old or old.owner~=owner then return nil end
+   local nextData=copy(snapshot)
+   -- Purchase receipts are saved atomically with their grant.
+   nextData.receipts=copy(old.data.receipts or {})
+   if transform then transform(nextData) end
+   local result={data=nextData,lease=release and 0 or os.time()+180}
+   if not release then result.owner=owner end
+   return result
+  end)
+ end)
+ if ok and result then s.data=result.data end
+ s.busy=false
+ if not ok or not result then
+  s.saveFailed=true
+  if not release then player:Kick('Сохранение недоступно. Войди снова, чтобы защитить прогресс.') end
+  return false
+ end
+ return true
+end
+function P.WaitSave(player,release)
+ local s=P.Live[player]; if not s or s.offline then return end
+ local deadline=os.clock()+20
+ while s.busy and os.clock()&lt;deadline do task.wait(.1) end
+ if not s.busy then P.Commit(player,nil,release) end
+end
+function P.Copy(x) return copy(x) end
+return P
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX9">
+      <Properties>
+        <string name="Name">World</string>
+        <ProtectedString name="Source">local W={}
+function W.Build()
+ local old=workspace:FindFirstChild('UnderlayerWorld'); if old then old:Destroy() end
+ local root=Instance.new('Folder'); root.Name='UnderlayerWorld'; root.Parent=workspace
+ local function block(name,size,pos,color,material)
+  local p=Instance.new('Part'); p.Name=name; p.Size=size; p.Position=pos; p.Anchored=true
+  p.Color=color; p.Material=material or Enum.Material.Slate; p.TopSurface=Enum.SurfaceType.Smooth; p.BottomSurface=Enum.SurfaceType.Smooth
+  p.Parent=root; return p
+ end
+ local lighting=game:GetService('Lighting')
+ lighting.ClockTime=1.2; lighting.Brightness=2; lighting.Ambient=Color3.fromRGB(76,85,106); lighting.OutdoorAmbient=Color3.fromRGB(65,76,92)
+ lighting.FogColor=Color3.fromRGB(30,41,52); lighting.FogStart=80; lighting.FogEnd=310
+ local atmosphere=Instance.new('Atmosphere'); atmosphere.Density=.28; atmosphere.Color=Color3.fromRGB(152,175,186); atmosphere.Decay=Color3.fromRGB(46,52,71); atmosphere.Parent=lighting
+ block('Bedrock',Vector3.new(210,8,260),Vector3.new(0,-11,50),Color3.fromRGB(28,34,43))
+ block('Camp',Vector3.new(92,6,52),Vector3.new(0,0,-44),Color3.fromRGB(48,60,69),Enum.Material.Concrete)
+ -- Stairs remain after excavation, so players can leave the lowest layer.
+ for i=0,7 do
+  local top=-6+(i+1)*1.2
+  block('ExitStep',Vector3.new(100,1.3,2.1),Vector3.new(0,top-.65,-5-i*2),Color3.fromRGB(58,68,78),Enum.Material.Concrete)
+ end
+ local spawn=Instance.new('SpawnLocation'); spawn.Name='CampSpawn'; spawn.Size=Vector3.new(7,1,7); spawn.Position=Vector3.new(0,4,-45); spawn.Anchored=true; spawn.Neutral=true; spawn.Transparency=1; spawn.Parent=root
+ for _,x in ipairs({-36,36}) do
+  block('Tower',Vector3.new(2,22,2),Vector3.new(x,13,-39),Color3.fromRGB(51,65,74),Enum.Material.Metal)
+  local lamp=block('Lamp',Vector3.new(3,1,3),Vector3.new(x,24,-39),Color3.fromRGB(171,224,213),Enum.Material.Neon)
+  local light=Instance.new('PointLight'); light.Brightness=3; light.Range=55; light.Color=lamp.Color; light.Parent=lamp
+ end
+ local terminal=block('Terminal',Vector3.new(9,6,5),Vector3.new(-16,6,-42),Color3.fromRGB(74,104,111),Enum.Material.Metal)
+ local screen=block('TerminalScreen',Vector3.new(7,3,.2),Vector3.new(-16,7,-44.6),Color3.fromRGB(127,207,188),Enum.Material.Neon)
+ local prompt=Instance.new('ProximityPrompt'); prompt.ActionText='Сдать ресурсы'; prompt.ObjectText='Терминал экспедиции'; prompt.HoldDuration=.25; prompt.MaxActivationDistance=12; prompt.Parent=terminal
+ local bench=block('Workbench',Vector3.new(9,4,5),Vector3.new(16,5,-42),Color3.fromRGB(105,87,71),Enum.Material.Metal)
+ local up=Instance.new('ProximityPrompt'); up.ActionText='Улучшить инструмент'; up.ObjectText='Мастерская'; up.HoldDuration=.25; up.MaxActivationDistance=12; up.Parent=bench
+ for _,x in ipairs({-82,82}) do
+  for z=-35,150,24 do
+   local rock=block('Cliff',Vector3.new(27,45+(z%19),30),Vector3.new(x,10,z),Color3.fromRGB(37,45,57))
+   rock.CFrame=rock.CFrame*CFrame.Angles(.1,z*.03,.08)
+  end
+ end
+ for i=1,14 do
+  local x=(i%2==0 and -1 or 1)*(22+i*2.5); local z= i*11-10
+  local shard=block('DistantCrystal',Vector3.new(1.5,4+i%4,1.5),Vector3.new(x,1,z),Color3.fromRGB(92,139,163),Enum.Material.Neon)
+  shard.CFrame=shard.CFrame*CFrame.Angles(.15,0,.25)
+ end
+ local board=block('Sign',Vector3.new(26,8,1),Vector3.new(0,12,-66),Color3.fromRGB(24,35,43),Enum.Material.Metal)
+ local sg=Instance.new('SurfaceGui'); sg.Face=Enum.NormalId.Front; sg.Parent=board
+ local t=Instance.new('TextLabel'); t.Size=UDim2.fromScale(1,1); t.BackgroundTransparency=1; t.Text='UNDERLAYER\nЭКСПЕДИЦИЯ 07 / НЕ БУДИТЬ'; t.TextColor3=Color3.fromRGB(192,224,215); t.Font=Enum.Font.GothamBold; t.TextScaled=true; t.Parent=sg
+ return {Root=root, Sell=prompt, Upgrade=up}
+end
+return W
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="Script" referent="RBX10">
+      <Properties>
+        <string name="Name">UnderlayerServer</string>
+        <ProtectedString name="Source">local Players=game:GetService('Players')
+local RS=game:GetService('ReplicatedStorage')
+local Market=game:GetService('MarketplaceService')
+local Policy=game:GetService('PolicyService')
+local Run=game:GetService('RunService')
+local Tween=game:GetService('TweenService')
+local F=RS:WaitForChild('Underlayer')
+local C=require(F.Config); local Visual=require(F.PetVisual)
+local Profile=require(script.Parent.Profile)
+local world=require(script.Parent.World).Build()
+local event=F.Action
+local rng=Random.new()
+local sessions={}
+local blocks=Instance.new('Folder'); blocks.Name='Deposits'; blocks.Parent=world.Root
+local petsFolder=Instance.new('Folder'); petsFolder.Name='Companions'; petsFolder.Parent=world.Root
+local function tell(p,message) if p.Parent then event:FireClient(p,'message',message) end end
+local function rootOf(p)
+ local ch=p.Character; local h=ch and ch:FindFirstChildOfClass('Humanoid')
+ return h and h.Health&gt;0 and ch:FindFirstChild('HumanoidRootPart') or nil
+end
+local function state(p)
+ local s=Profile.Live[p]; if s and not s.busy and not s.saveFailed then return s.data end
+end
+local function sync(p)
+ local s=Profile.Live[p]; local u=sessions[p]
+ if not s or not u then return end
+ local d=Profile.Copy(s.data); d.receipts=nil
+ d.level=C.Level(d.xp); d.help=u.help; d.slots=u.slots and 3 or 1
+ d.eggAllowed=u.policy==true and not s.offline
+ d.offline=s.offline; d.configured=C.EggProduct&gt;0
+ event:FireClient(p,'data',d)
+end
+local function rebuild(p)
+ local u=sessions[p]; local d=Profile.Live[p] and Profile.Live[p].data
+ if not u or not d then return end
+ for _,model in ipairs(u.models) do model:Destroy() end; u.models={}
+ local root=rootOf(p)
+ for i,id in ipairs(d.equipped) do
+  if i&gt;(u.slots and 3 or 1) then break end
+  local pet=d.pets[id]
+  if pet and C.Pets[id] then
+   local def=table.clone(C.Pets[id])
+   if pet.fragments&gt;=5 then def.color=def.color:Lerp(Color3.new(1,1,1),.45) end
+   local model=Visual.Build(id,def,pet.growth)
+   model.Parent=petsFolder
+   model:PivotTo(root and root.CFrame*CFrame.new(i*3,0,4) or CFrame.new(0,6,-45))
+   table.insert(u.models,model)
+  end
+ end
+end
+local function refreshEntitlements(p)
+ local u=sessions[p]; if not u then return end
+ for _,kind in ipairs({'Help','Slots'}) do
+  local id=kind=='Help' and C.HelpPass or C.SlotsPass
+  if id&gt;0 then
+   local ok,owns=pcall(Market.UserOwnsGamePassAsync,Market,p.UserId,id)
+   if ok then u[string.lower(kind)]=owns end
+  end
+ end
+ sync(p); rebuild(p)
+end
+local hazardSerial=0
+local function hazard(position)
+ hazardSerial=hazardSerial+1
+ local marker=Instance.new('Part'); marker.Name='UnstableDeposit'; marker.Shape=Enum.PartType.Cylinder
+ marker.Size=Vector3.new(.12,16,16); marker.CFrame=CFrame.new(position.X,position.Y+2,position.Z)*CFrame.Angles(0,0,math.pi/2)
+ marker.Color=Color3.fromRGB(255,118,92); marker.Material=Enum.Material.Neon; marker.Transparency=.35
+ marker.Anchored=true; marker.CanCollide=false; marker.CanQuery=false; marker.Parent=world.Root
+ for _,p in ipairs(Players:GetPlayers()) do
+  local root=rootOf(p); if root and (root.Position-position).Magnitude&lt;32 then tell(p,'ТРЕСК ПОД НОГАМИ — отойди от красного круга!') end
+ end
+ task.delay(2.5,function()
+  for _,p in ipairs(Players:GetPlayers()) do
+   local root=rootOf(p)
+   if root and (root.Position-position).Magnitude&lt;10 then root.Parent:FindFirstChildOfClass('Humanoid'):TakeDamage(38) end
+  end
+  local burst=Instance.new('Part'); burst.Shape=Enum.PartType.Ball; burst.Size=Vector3.new(1,1,1); burst.Position=position
+  burst.Color=Color3.fromRGB(223,128,112); burst.Material=Enum.Material.Neon; burst.Anchored=true; burst.CanCollide=false; burst.CanQuery=false; burst.Parent=world.Root
+  Tween:Create(burst,TweenInfo.new(.5),{Size=Vector3.new(16,16,16),Transparency=1}):Play()
+  marker:Destroy(); game:GetService('Debris'):AddItem(burst,.7)
+ end)
+end
+local function makeBlock(x,z,layer)
+ local b=Instance.new('Part'); b.Name='Слой '..layer
+ b.Size=Vector3.new(6.8,2.5,6.8); b.Position=Vector3.new(x,4.25-(layer-1)*2.5,z)
+ b.Color=({Color3.fromRGB(97,101,109),Color3.fromRGB(75,86,100),Color3.fromRGB(86,75,106)})[layer]
+ b.Material=layer==1 and Enum.Material.Sand or Enum.Material.Slate
+ b.Anchored=true; b:SetAttribute('Layer',layer); b:SetAttribute('HP',layer+1); b:SetAttribute('MaxHP',layer+1)
+ b:SetAttribute('Hazard',rng:NextNumber()&lt;.085)
+ b:SetAttribute('Find',rng:NextNumber()&lt;.075)
+ b.Parent=blocks
+end
+for ix=-6,6 do for iz=0,17 do for layer=1,3 do makeBlock(ix*7,iz*7,layer) end end end
+local depleted={}
+local cleared=0
+local function totalCapacity(d) return C.Tools[d.tool].capacity end
+local function dig(p,b,auto)
+ local d=state(p); local root=rootOf(p)
+ if not d or not root or typeof(b)~='Instance' or not b:IsA('BasePart') or b.Parent~=blocks then return end
+ if (root.Position-b.Position).Magnitude&gt;18 then return end
+ local params=RaycastParams.new(); params.FilterType=Enum.RaycastFilterType.Exclude
+ params.FilterDescendantsInstances={p.Character,petsFolder}
+ local origin=root.Position+Vector3.new(0,1,0)
+ local hit=workspace:Raycast(origin,b.Position-origin,params)
+ if not hit or hit.Instance~=b then return end
+ local layer=b:GetAttribute('Layer')
+ if d.bag&gt;=totalCapacity(d) then if not auto then tell(p,'Рюкзак полон. Вернись к терминалу в лагере.') end; return end
+ local hp=b:GetAttribute('HP')-(auto and 1 or C.Tools[d.tool].power)
+ if hp&gt;0 then b:SetAttribute('HP',hp); b.Color=b.Color:Lerp(Color3.fromRGB(156,175,173),.15); return end
+ local pos=b.Position; local find=b:GetAttribute('Find'); local danger=b:GetAttribute('Hazard')
+ table.insert(depleted,{x=pos.X,z=pos.Z,layer=layer})
+ b:Destroy(); cleared=cleared+1
+ d.bag=math.min(totalCapacity(d),d.bag+3+layer*2)
+ local before=C.Level(d.xp); d.xp=d.xp+5+layer*2
+ local level=C.Level(d.xp)
+ local changed=false
+ for _,id in ipairs(d.equipped) do
+  local pet=d.pets[id]
+  if pet and pet.growth&lt;math.min(level,50) then
+   pet.growth=math.min(level,50,pet.growth+.14); changed=true
+  end
+ end
+ if level&gt;before then tell(p,'УРОВЕНЬ '..level..' • малыши могут вырасти ещё!') end
+ if find then
+  local ids={'Dust','Moss','Crystal'}; local id=ids[rng:NextInteger(1,#ids)]
+  if d.pets[id] then
+   d.pets[id].fragments=d.pets[id].fragments+1
+   tell(p,'Найден фрагмент: '..C.Pets[id].name..'. 5 фрагментов открывают светлый окрас.')
+  else d.pets[id]={growth=1,fragments=0}; tell(p,'В коконе спал '..C.Pets[id].name..'! Открой коллекцию.') end
+ end
+ if danger then hazard(pos) end
+ if changed then
+  local u=sessions[p]
+  if os.clock()-(u.lastRebuild or 0)&gt;5 then u.lastRebuild=os.clock(); rebuild(p) end
+ end
+ if cleared==90 then
+  for _,pl in ipairs(Players:GetPlayers()) do tell(pl,'Под коркой обнаружена древняя капсула. Центральный сектор изменился.') end
+  local capsule=Instance.new('Part'); capsule.Name='AncientCapsule'; capsule.Shape=Enum.PartType.Ball
+  capsule.Size=Vector3.new(9,13,9); capsule.Position=Vector3.new(0,1,63); capsule.Material=Enum.Material.Neon
+  capsule.Color=Color3.fromRGB(126,137,184); capsule.Anchored=true; capsule.Parent=world.Root
+  local prompt=Instance.new('ProximityPrompt'); prompt.ActionText='Освободить малыша'; prompt.ObjectText='Древняя капсула'; prompt.HoldDuration=2; prompt.MaxActivationDistance=13; prompt.Parent=capsule
+  local claimed={}
+  prompt.Triggered:Connect(function(pl)
+   local dd=state(pl); local rr=rootOf(pl)
+   if not dd or not rr or (rr.Position-capsule.Position).Magnitude&gt;17 or claimed[pl.UserId] then return end
+   claimed[pl.UserId]=true
+   if not dd.pets.Crystal then dd.pets.Crystal={growth=1,fragments=0} else dd.pets.Crystal.fragments=dd.pets.Crystal.fragments+2 end
+   dd.xp=dd.xp+100; tell(pl,'Кристик освобождён. +100 опыта.'); sync(pl)
+  end)
+ end
+ sync(p)
+end
+world.Sell.Triggered:Connect(function(p)
+ local d=state(p); local root=rootOf(p)
+ if not d or not root or (root.Position-world.Sell.Parent.Position).Magnitude&gt;16 then return end
+ local amount=d.bag; d.coins=d.coins+amount*2; d.bag=0; sync(p); tell(p,'Сдано '..amount..' ресурсов • +'..(amount*2)..' монет')
+end)
+world.Upgrade.Triggered:Connect(function(p)
+ local d=state(p); local root=rootOf(p)
+ if not d or not root or (root.Position-world.Upgrade.Parent.Position).Magnitude&gt;16 then return end
+ local nextTool=C.Tools[d.tool+1]
+ if not nextTool then tell(p,'Бур уже максимального уровня.'); return end
+ if d.coins&lt;nextTool.cost then tell(p,nextTool.name..': нужно '..nextTool.cost..' монет.'); return end
+ d.coins=d.coins-nextTool.cost; d.tool=d.tool+1; sync(p); tell(p,'Получен '..nextTool.name..'!')
+end)
+local function givePet(d,id)
+ if d.pets[id] then d.pets[id].fragments=d.pets[id].fragments+1 else d.pets[id]={growth=1,fragments=0} end
+end
+local function eggRoll()
+ local n=rng:NextNumber(0,100); local sum=0
+ for _,o in ipairs(C.EggOdds) do sum=sum+o.chance; if n&lt;sum then return o.id end end
+ return C.EggOdds[#C.EggOdds].id
+end
+local function productKind(id)
+ if id==0 then return nil end
+ if id==C.EggProduct then return 'egg' end
+ for pet,product in pairs(C.DirectProducts) do if id==product then return pet end end
+end
+Market.ProcessReceipt=function(receipt)
+ local p=Players:GetPlayerByUserId(receipt.PlayerId)
+ local s=p and Profile.Live[p]; local u=p and sessions[p]
+ local kind=productKind(receipt.ProductId)
+ if not p or not s or not u or s.offline or not kind then return Enum.ProductPurchaseDecision.NotProcessedYet end
+ while s.busy and p.Parent do task.wait(.1) end
+ if not p.Parent or s.saveFailed then return Enum.ProductPurchaseDecision.NotProcessedYet end
+ local ok=Profile.Commit(p,function(d)
+  if d.receipts[receipt.PurchaseId] then return end
+  if kind=='egg' then d.eggs=d.eggs+1 else givePet(d,kind) end
+  d.receipts[receipt.PurchaseId]=true
+ end)
+ if not ok then return Enum.ProductPurchaseDecision.NotProcessedYet end
+ sync(p); tell(p,kind=='egg' and 'Яйцо добавлено в коллекцию. Открой его в магазине.' or 'Малыш добавлен в коллекцию!')
+ return Enum.ProductPurchaseDecision.PurchaseGranted
+end
+Market.PromptGamePassPurchaseFinished:Connect(function(p,id,purchased)
+ if purchased and (id==C.HelpPass or id==C.SlotsPass) then task.defer(refreshEntitlements,p) end
+end)
+local function onPlayer(p)
+ sessions[p]={models={},help=false,slots=false,policy=false,lastAction=0,lastDig=0}
+ local s,err=Profile.Load(p)
+ if not s then sessions[p]=nil; p:Kick(err); return end
+ if not p.Parent then Profile.WaitSave(p,true); Profile.Live[p]=nil; sessions[p]=nil; return end
+ local u=sessions[p]
+ local ok,policy=pcall(Policy.GetPolicyInfoForPlayerAsync,Policy,p)
+ if ok then u.policy=policy.ArePaidRandomItemsRestricted==false end
+ local function character(ch)
+  local hum=ch:WaitForChild('Humanoid'); hum.WalkSpeed=18
+  hum.Died:Connect(function()
+   local live=Profile.Live[p]
+   if not live then return end
+   -- Wait out an in-flight durable purchase before changing the same profile.
+   while live.busy do task.wait(.05) end
+   local d=live.data; local lost=math.ceil(d.bag*.25); d.bag=d.bag-lost
+   tell(p,'Экстренная эвакуация. Потеряно '..lost..' несданных ресурсов.'); sync(p)
+  end)
+  task.delay(.8,function() if sessions[p] then rebuild(p); sync(p) end end)
+ end
+ p.CharacterAdded:Connect(character)
+ if p.Character then task.spawn(character,p.Character) end
+ refreshEntitlements(p); sync(p)
+ if s.offline then tell(p,'РЕЖИМ STUDIO: сохранение недоступно. Прогресс временный, покупки отключены.') end
+end
+Players.PlayerAdded:Connect(onPlayer)
+for _,p in ipairs(Players:GetPlayers()) do task.spawn(onPlayer,p) end
+Players.PlayerRemoving:Connect(function(p)
+ Profile.WaitSave(p,true)
+ local u=sessions[p]; if u then for _,m in ipairs(u.models) do m:Destroy() end end
+ sessions[p]=nil; Profile.Live[p]=nil
+end)
+event.OnServerEvent:Connect(function(p,action,arg)
+ local u=sessions[p]; local d=state(p)
+ if not u or not d then return end
+ if action=='sync' then if os.clock()-(u.lastSync or 0)&lt;1 then return end; u.lastSync=os.clock(); sync(p); return end
+ if action=='dig' then
+  if os.clock()-u.lastDig&lt;.32 then return end; u.lastDig=os.clock(); dig(p,arg,false); return
+ end
+ if os.clock()-u.lastAction&lt;.4 then return end; u.lastAction=os.clock()
+ if action=='equip' then
+  if typeof(arg)~='string' or not d.pets[arg] then return end
+  local found=table.find(d.equipped,arg)
+  if found then table.remove(d.equipped,found)
+  elseif #d.equipped&lt;(u.slots and 3 or 1) then table.insert(d.equipped,arg)
+  else tell(p,'Все места заняты. Сначала убери выбранного спутника.'); return end
+  rebuild(p); sync(p)
+ elseif action=='buy' then
+  if Profile.Live[p].offline then tell(p,'Покупки отключены в режиме без сохранения.'); return end
+  if arg=='help' or arg=='slots' then
+   local id=arg=='help' and C.HelpPass or C.SlotsPass
+   if id&lt;=0 then tell(p,'Покупка ещё не настроена создателем.'); return end
+   if (arg=='help' and u.help) or (arg=='slots' and u.slots) then tell(p,'Уже приобретено.'); return end
+   Market:PromptGamePassPurchase(p,id)
+  else
+   local id=0
+   if arg=='egg' then
+    if not u.policy then tell(p,'Платные случайные яйца недоступны для этого аккаунта. Выбери конкретного малыша.'); return end
+    id=C.EggProduct
+   elseif typeof(arg)=='string' then id=C.DirectProducts[arg] or 0 end
+   if id&lt;=0 then tell(p,'Покупка ещё не настроена создателем.'); return end
+   Market:PromptProductPurchase(p,id)
+  end
+ elseif action=='hatch' then
+  if not u.policy or Profile.Live[p].offline or d.eggs&lt;1 then tell(p,'Нет доступного яйца или открытие недоступно.'); return end
+  local id=eggRoll()
+  local ok=Profile.Commit(p,function(dd) dd.eggs=dd.eggs-1; givePet(dd,id) end)
+  if ok then tell(p,'Из яйца появился '..C.Pets[id].name..'! Повтор даёт фрагмент окраса.'); sync(p) end
+ end
+end)
+local tickTime=0
+Run.Heartbeat:Connect(function(dt)
+ tickTime=tickTime+dt; if tickTime&lt;.05 then return end
+ local step=tickTime; tickTime=0
+ for p,u in pairs(sessions) do
+  local r=rootOf(p)
+  if r then
+   for i,m in ipairs(u.models) do
+    if m.PrimaryPart then
+     local x=(i-(#u.models+1)/2)*3
+     local target=r.CFrame*CFrame.new(x,.2+math.sin(os.clock()*3+i)*.25,4)
+     m:PivotTo(m:GetPivot():Lerp(target,1-math.exp(-7*step)))
+    end
+   end
+  end
+ end
+end)
+task.spawn(function()
+ while task.wait(3) do
+  for p,u in pairs(sessions) do
+   local r=rootOf(p)
+   if u.help and #u.models&gt;0 and r then
+    local nearest=nil; local distance=15
+    for _,b in ipairs(blocks:GetChildren()) do
+     local n=(b.Position-r.Position).Magnitude
+     if n&lt;distance then distance=n; nearest=b end
+    end
+    if nearest then for _=1,#u.models do if nearest.Parent then dig(p,nearest,true) end end end
+   end
+  end
+ end
+end)
+task.spawn(function()
+ while task.wait(45) do for p in pairs(Profile.Live) do task.spawn(Profile.WaitSave,p,false) end end
+end)
+task.spawn(function()
+ while task.wait(600) do
+  -- Rare server-wide respawn: only three fully emptied columns, never inside a player.
+  local count=0
+  for index=#depleted,1,-1 do
+   local spot=depleted[index]; local free=true
+   for _,b in ipairs(blocks:GetChildren()) do if b.Position.X==spot.x and b.Position.Z==spot.z then free=false; break end end
+   for _,p in ipairs(Players:GetPlayers()) do local r=rootOf(p); if r and (r.Position-Vector3.new(spot.x,r.Position.Y,spot.z)).Magnitude&lt;12 then free=false end end
+   if free then
+    for layer=1,3 do makeBlock(spot.x,spot.z,layer) end
+    table.remove(depleted,index); count=count+1
+    if count&gt;=3 then break end
+   end
+  end
+  if count&gt;0 then for _,p in ipairs(Players:GetPlayers()) do tell(p,'Сканер: обнаружено '..count..' новых залежей.') end end
+ end
+end)
+game:BindToClose(function()
+ local pending=0
+ for p in pairs(Profile.Live) do pending=pending+1; task.spawn(function() Profile.WaitSave(p,true); pending=pending-1 end) end
+ local deadline=os.clock()+25; while pending&gt;0 and os.clock()&lt;deadline do task.wait(.1) end
+end)
+</ProtectedString>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="StarterPlayer" referent="RBX11">
+    <Properties>
+      <string name="Name">StarterPlayer</string>
+    </Properties>
+    <Item class="StarterPlayerScripts" referent="RBX12">
+      <Properties>
+        <string name="Name">StarterPlayerScripts</string>
+      </Properties>
+      <Item class="LocalScript" referent="RBX13">
+        <Properties>
+          <string name="Name">UnderlayerClient</string>
+          <ProtectedString name="Source">local Players=game:GetService('Players')
+local RS=game:GetService('ReplicatedStorage')
+local UIS=game:GetService('UserInputService')
+local Run=game:GetService('RunService')
+local Market=game:GetService('MarketplaceService')
+local Tween=game:GetService('TweenService')
+local player=Players.LocalPlayer
+local F=RS:WaitForChild('Underlayer'); local C=require(F.Config); local Visual=require(F.PetVisual)
+local event=F:WaitForChild('Action'); local data=nil
+local gui=Instance.new('ScreenGui'); gui.Name='UnderlayerUI'; gui.ResetOnSpawn=false; gui.IgnoreGuiInset=false; gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling; gui.Parent=player:WaitForChild('PlayerGui')
+local palette={bg=Color3.fromRGB(18,27,35),panel=Color3.fromRGB(30,43,53),line=Color3.fromRGB(66,86,96),text=Color3.fromRGB(228,235,229),muted=Color3.fromRGB(152,173,179),accent=Color3.fromRGB(158,206,184),gold=Color3.fromRGB(226,191,126)}
+local function corner(obj,n) local c=Instance.new('UICorner'); c.CornerRadius=UDim.new(0,n or 10); c.Parent=obj end
+local function frame(parent,size,pos,color)
+ local f=Instance.new('Frame'); f.Size=size; f.Position=pos; f.BackgroundColor3=color or palette.panel; f.BorderSizePixel=0; f.Parent=parent; corner(f); return f
+end
+local function label(parent,size,pos,txt,n,color)
+ local l=Instance.new('TextLabel'); l.BackgroundTransparency=1; l.Size=size; l.Position=pos; l.Text=txt; l.TextColor3=color or palette.text
+ l.Font=Enum.Font.GothamMedium; l.TextSize=n or 16; l.TextXAlignment=Enum.TextXAlignment.Left; l.TextWrapped=true; l.Parent=parent; return l
+end
+local function button(parent,size,pos,txt,callback,color)
+ local b=Instance.new('TextButton'); b.Size=size; b.Position=pos; b.Text=txt; b.Font=Enum.Font.GothamBold; b.TextSize=14; b.TextColor3=palette.bg
+ b.BackgroundColor3=color or palette.accent; b.AutoButtonColor=true; b.BorderSizePixel=0; b.Parent=parent; corner(b,8)
+ b.Activated:Connect(callback); return b
+end
+local top=frame(gui,UDim2.new(1,-32,0,78),UDim2.fromOffset(16,12),palette.bg)
+label(top,UDim2.new(.46,0,0,30),UDim2.fromOffset(16,7),'UNDERLAYER',23,palette.accent)
+local stats=label(top,UDim2.new(.52,-16,0,36),UDim2.new(.48,0,0,7),'Загрузка экспедиции...',14)
+local levelText=label(top,UDim2.new(.6,0,0,22),UDim2.fromOffset(16,46),'ЭКСПЕДИЦИЯ 07 / ОБЩАЯ ЗОНА',11,palette.muted)
+local xpBack=frame(top,UDim2.new(.35,-16,0,5),UDim2.new(.65,0,0,58),palette.line)
+local xpBar=frame(xpBack,UDim2.fromScale(0,1),UDim2.fromScale(0,0),palette.accent)
+local toast=frame(gui,UDim2.new(.8,0,0,66),UDim2.new(.1,0,0,104),palette.bg)
+local toastText=label(toast,UDim2.new(1,-24,1,0),UDim2.fromOffset(12,0),'Очищай поверхность. Сдавай ресурсы в лагере. Найди спящих малышей.',15)
+local help=label(gui,UDim2.new(.65,0,0,52),UDim2.new(.02,0,1,-118),'ЛКМ / удерживать — раскапывать\nE у терминала — сдать • E у верстака — улучшить',13,palette.muted)
+local cross=label(gui,UDim2.fromOffset(24,24),UDim2.new(.5,-12,.5,-12),'+',24,palette.accent); cross.TextXAlignment=Enum.TextXAlignment.Center
+local targetText=label(gui,UDim2.fromOffset(300,44),UDim2.new(.5,-150,.5,20),'',13); targetText.TextXAlignment=Enum.TextXAlignment.Center
+local nav=frame(gui,UDim2.new(1,-32,0,54),UDim2.new(0,16,1,-62),palette.bg)
+local modal=frame(gui,UDim2.new(.94,0,.71,0),UDim2.fromScale(.03,.19),palette.bg); modal.Visible=false
+local title=label(modal,UDim2.new(1,-80,0,48),UDim2.fromOffset(18,0),'',22,palette.accent)
+button(modal,UDim2.fromOffset(40,34),UDim2.new(1,-52,0,8),'×',function() modal.Visible=false end)
+local content=Instance.new('ScrollingFrame'); content.Size=UDim2.new(1,-28,1,-64); content.Position=UDim2.fromOffset(14,54); content.BackgroundTransparency=1; content.BorderSizePixel=0
+content.AutomaticCanvasSize=Enum.AutomaticSize.Y; content.CanvasSize=UDim2.new(); content.ScrollBarThickness=5; content.ScrollBarImageColor3=palette.accent; content.Parent=modal
+local list=Instance.new('UIListLayout'); list.Padding=UDim.new(0,10); list.SortOrder=Enum.SortOrder.LayoutOrder; list.Parent=content
+local padding=Instance.new('UIPadding'); padding.PaddingBottom=UDim.new(0,14); padding.PaddingRight=UDim.new(0,6); padding.Parent=content
+local currentPage=''; local previewStage=1
+local selectedPreview='Dust'; local previewModel=nil; local spin=0
+local products={}; local fetchPending={}
+local function price(id,isPass)
+ if not id or id&lt;=0 then return 'Не настроено' end
+ local key=tostring(id)..tostring(isPass)
+ if products[key] then return products[key] end
+ if not fetchPending[key] then
+  fetchPending[key]=true
+  task.spawn(function()
+   local ok,info=pcall(Market.GetProductInfoAsync,Market,id,isPass and Enum.InfoType.GamePass or Enum.InfoType.Product)
+   products[key]=ok and info and info.PriceInRobux and (tostring(info.PriceInRobux)..' R$') or 'Цена в окне Roblox'
+   fetchPending[key]=nil
+  end)
+ end
+ return 'Цена в окне Roblox'
+end
+local function clear()
+ previewModel=nil
+ for _,child in ipairs(content:GetChildren()) do if child:IsA('Frame') or child:IsA('TextLabel') then child:Destroy() end end
+ content.CanvasPosition=Vector2.zero
+end
+local function row(height)
+ local r=frame(content,UDim2.new(1,0,0,height),UDim2.new(),palette.panel); return r
+end
+local function viewport(parent,id,growth,size,pos)
+ local v=Instance.new('ViewportFrame'); v.Size=size; v.Position=pos; v.BackgroundTransparency=1
+ v.Ambient=Color3.fromRGB(182,194,211); v.LightColor=Color3.fromRGB(245,231,215); v.LightDirection=Vector3.new(-1,-1,-1); v.Parent=parent
+ local world=Instance.new('WorldModel'); world.Parent=v
+ local m=Visual.Build(id,C.Pets[id],growth)
+ -- Remove overhead nameplates from the 3D preview.
+ for _,desc in ipairs(m:GetDescendants()) do if desc:IsA('BillboardGui') then desc:Destroy() end end
+ m.Parent=world
+ local camera=Instance.new('Camera'); camera.CFrame=CFrame.lookAt(Vector3.new(4,2.5,-7),Vector3.new(0,.4,0)); camera.FieldOfView=36; camera.Parent=v; v.CurrentCamera=camera
+ return m
+end
+local function buy(key) event:FireServer('buy',key) end
+local render
+render=function(page)
+ currentPage=page; clear(); modal.Visible=true
+ if page=='collection' then
+  title.Text='Коллекция / рост малышей'
+  if not data then label(row(60),UDim2.fromScale(1,1),UDim2.new(),'Загрузка...',16); return end
+  local info=row(60)
+  label(info,UDim2.new(1,-24,1,0),UDim2.fromOffset(12,0),'Активных: '..#data.equipped..'/'..data.slots..' • бесплатный спутник следует за тобой. Помощь в добыче — отдельный пропуск.',13,palette.muted)
+  local preview=row(240)
+  local grow=({1,6,15,30,50})[previewStage]
+  previewModel=viewport(preview,selectedPreview,grow,UDim2.new(.45,0,1,-20),UDim2.fromOffset(0,10))
+  label(preview,UDim2.new(.53,-12,0,55),UDim2.new(.46,0,0,12),C.Pets[selectedPreview].name..' / просмотр роста',18)
+  label(preview,UDim2.new(.53,-12,0,60),UDim2.new(.46,0,0,68),'Уровни: 1 → 6 → 15 → 30 → 50\nСтадия '..previewStage..' из 5',13,palette.muted)
+  button(preview,UDim2.new(.49,0,0,40),UDim2.new(.46,0,0,145),'Следующая стадия',function() previewStage=previewStage%5+1; render('collection') end)
+  label(preview,UDim2.new(.53,-12,0,40),UDim2.new(.46,0,0,190),'Это предпросмотр, он не меняет питомца.',11,palette.muted)
+  for _,id in ipairs({'Dust','Moss','Crystal','Nova','Umbra','Sol'}) do
+   local def=C.Pets[id]; local owned=data.pets[id]; local r=row(126)
+   viewport(r,id,owned and owned.growth or 1,UDim2.new(.22,0,1,0),UDim2.new())
+   label(r,UDim2.new(.76,-10,0,30),UDim2.new(.23,0,0,8),def.name..(def.premium and ' • особый' or ''),16,def.color)
+   label(r,UDim2.new(.76,-10,0,35),UDim2.new(.23,0,0,38),owned and ('Рост '..string.format('%.1f',owned.growth)..' / '..data.level..' • фрагменты '..owned.fragments) or (def.premium and 'Покупка в магазине' or 'Спит в одном из коконов'),12,palette.muted)
+   button(r,UDim2.new(.34,0,0,34),UDim2.new(.23,0,0,82),'Посмотреть рост',function() selectedPreview=id; previewStage=1; render('collection') end)
+   if owned then
+    button(r,UDim2.new(.34,0,0,34),UDim2.new(.61,0,0,82),table.find(data.equipped,id) and 'Убрать' or 'Взять с собой',function() event:FireServer('equip',id) end)
+   end
+  end
+ elseif page=='shop' then
+  title.Text='Магазин экспедиции'
+  local intro=row(94)
+  label(intro,UDim2.new(1,-24,1,0),UDim2.fromOffset(12,0),'Бесплатно: раскопки, все три инструмента, уровень и три вида малышей. За Robux: помощь, особые малыши и 3 активных спутника. Предметы не обмениваются.',14,palette.muted)
+  for _,entry in ipairs({{key='help',name='Помощь малышей',desc='Каждый активный малыш наносит 1 урон залежи рядом раз в 3 секунды.',id=C.HelpPass},{key='slots',name='Три спутника',desc='Три активных малыша вместо одного. Коллекция всегда без ограничения.',id=C.SlotsPass}}) do
+   local r=row(128)
+   label(r,UDim2.new(1,-24,0,30),UDim2.fromOffset(12,8),entry.name,18)
+   label(r,UDim2.new(1,-24,0,40),UDim2.fromOffset(12,40),entry.desc,13,palette.muted)
+   button(r,UDim2.new(1,-24,0,32),UDim2.fromOffset(12,87),price(entry.id,true),function() buy(entry.key) end)
+  end
+  for _,id in ipairs({'Nova','Umbra','Sol'}) do
+   local r=row(145); viewport(r,id,10,UDim2.new(.25,0,1,0),UDim2.new())
+   label(r,UDim2.new(.71,0,0,30),UDim2.new(.27,0,0,10),C.Pets[id].name..' • конкретный малыш',17,C.Pets[id].color)
+   label(r,UDim2.new(.71,0,0,38),UDim2.new(.27,0,0,43),'Гарантированный вид. Повтор: +1 фрагмент светлого окраса.',12,palette.muted)
+   button(r,UDim2.new(.34,0,0,38),UDim2.new(.27,0,0,94),price(C.DirectProducts[id],false),function() buy(id) end)
+   button(r,UDim2.new(.32,0,0,38),UDim2.new(.64,0,0,94),'Стадии роста',function() selectedPreview=id; previewStage=1; render('collection') end)
+  end
+  local egg=row(208)
+  label(egg,UDim2.new(1,-24,0,36),UDim2.fromOffset(12,8),'Кристальное яйцо',20,palette.gold)
+  local odds={}; for _,o in ipairs(C.EggOdds) do table.insert(odds,C.Pets[o.id].name..' — '..o.chance..'%') end
+  label(egg,UDim2.new(1,-24,0,56),UDim2.fromOffset(12,44),table.concat(odds,'   /   ')..'\nПовтор даёт 1 фрагмент окраса. 5 фрагментов → светлый окрас.',13)
+  local allowed=data and data.eggAllowed
+  button(egg,UDim2.new(1,-24,0,36),UDim2.fromOffset(12,108),allowed and ('Купить яйцо • '..price(C.EggProduct,false)) or 'Случайные покупки недоступны',function() if allowed then buy('egg') end end,allowed and palette.gold or palette.muted)
+  button(egg,UDim2.new(1,-24,0,36),UDim2.fromOffset(12,156),'Открыть яйцо • в наличии '..(data and data.eggs or 0),function() event:FireServer('hatch') end,palette.accent)
+ elseif page=='journal' then
+  title.Text='Журнал экспедиции'
+  for _,entry in ipairs({
+   {'01 / ПЕРВАЯ СМЕНА','Спустись с лагеря к серой корке. Наведи курсор на блок и удерживай ЛКМ. На телефоне используй кнопку «Копать».'},
+   {'02 / РЕСУРСЫ','Рюкзак ограничен. Сдавай добычу у левого терминала в лагере. На выручку улучшай инструмент у правого верстака.'},
+   {'03 / НЕ БУДИТЬ','Если под землёй раздаётся треск и появляется красный круг, отойди. Через 2,5 секунды случится выброс. При гибели теряется 25% несданного.'},
+   {'04 / СПЯЩИЕ','Иногда под коркой прячутся малыши. Возьми найденного спутника с собой: он постепенно растёт до твоего уровня, пока ты раскапываешь залежи.'},
+   {'05 / ГЛУБИНА','Слои: пыль → камень → кристальная корка. После 90 общих очищенных блоков откроется древняя капсула. Каждый может получить её награду.'},
+   {'06 / ПЛАНЕТА ПОМНИТ','Внутри одного сервера раскопки общие. Раз в 10 минут возвращаются до трёх залежей. На новом сервере поверхность создаётся заново.'},
+  }) do local r=row(136); label(r,UDim2.new(1,-24,0,32),UDim2.fromOffset(12,8),entry[1],16,palette.accent); label(r,UDim2.new(1,-24,0,86),UDim2.fromOffset(12,43),entry[2],14,palette.muted) end
+ end
+end
+for i,item in ipairs({{'Малыши','collection'},{'Магазин','shop'},{'Журнал','journal'}}) do
+ button(nav,UDim2.new(1/3,-12,0,38),UDim2.new((i-1)/3,6,0,8),item[1],function() if modal.Visible and currentPage==item[2] then modal.Visible=false else render(item[2]) end end)
+end
+local function character(ch)
+ local h=ch:WaitForChild('Humanoid')
+ h.CameraOffset=Vector3.new(2,1,0)
+ player.CameraMinZoomDistance=6; player.CameraMaxZoomDistance=22
+ player.CameraMode=Enum.CameraMode.Classic
+ task.wait(.3)
+ local cam=workspace.CurrentCamera; local r=ch:FindFirstChild('HumanoidRootPart')
+ if r then cam.CFrame=CFrame.lookAt(r.Position+Vector3.new(12,9,-17),r.Position+Vector3.new(0,2,0)) end
+end
+player.CharacterAdded:Connect(character); if player.Character then task.spawn(character,player.Character) end
+local holding=false; local target=nil; local lastDig=0; local mouse=player:GetMouse()
+local function rayTarget()
+ local cam=workspace.CurrentCamera; if not cam then return nil end
+ local ray
+ if UIS.TouchEnabled and not UIS.MouseEnabled then ray=cam:ViewportPointToRay(cam.ViewportSize.X/2,cam.ViewportSize.Y/2)
+ else
+  local pos=UIS:GetMouseLocation(); ray=cam:ScreenPointToRay(pos.X,pos.Y)
+ end
+ local params=RaycastParams.new(); params.FilterType=Enum.RaycastFilterType.Exclude
+ local omit={}; if player.Character then table.insert(omit,player.Character) end
+ local world=workspace:FindFirstChild('UnderlayerWorld'); if world and world:FindFirstChild('Companions') then table.insert(omit,world.Companions) end
+ params.FilterDescendantsInstances=omit
+ local result=workspace:Raycast(ray.Origin,ray.Direction*150,params)
+ if result and result.Instance.Parent and result.Instance.Parent.Name=='Deposits' then return result.Instance end
+ return nil
+end
+local selection=Instance.new('Highlight'); selection.FillColor=palette.accent; selection.FillTransparency=.84; selection.OutlineColor=palette.accent; selection.DepthMode=Enum.HighlightDepthMode.Occluded; selection.Parent=workspace.CurrentCamera
+UIS.InputBegan:Connect(function(input,processed)
+ if not processed and input.UserInputType==Enum.UserInputType.MouseButton1 then holding=true end
+ if not processed and input.KeyCode==Enum.KeyCode.B then render('collection') end
+end)
+UIS.InputEnded:Connect(function(input) if input.UserInputType==Enum.UserInputType.MouseButton1 then holding=false end end)
+UIS.WindowFocusReleased:Connect(function() holding=false end)
+local digButton=button(gui,UDim2.fromOffset(112,56),UDim2.new(1,-130,1,-132),'Копать',function() if not modal.Visible then local b=rayTarget(); if b then event:FireServer('dig',b) end end end)
+digButton.Visible=UIS.TouchEnabled
+local toastToken=0
+local function message(txt)
+ toastToken=toastToken+1; local token=toastToken
+ toastText.Text=txt; toast.Visible=true
+ task.delay(8,function() if token==toastToken then toast.Visible=false end end)
+end
+event.OnClientEvent:Connect(function(action,payload)
+ if action=='message' then message(payload)
+ elseif action=='data' then
+  data=payload
+  local tool=C.Tools[data.tool]
+  stats.Text='Ур. '..data.level..'   •   '..data.coins..' монет\n'..tool.name..'   /   Рюкзак '..data.bag..' / '..tool.capacity
+  local floor=45*(data.level-1)^2; local ceiling=45*data.level^2
+  xpBar.Size=UDim2.fromScale(math.clamp((data.xp-floor)/(ceiling-floor),0,1),1)
+  levelText.Text=data.offline and 'STUDIO / ВРЕМЕННЫЙ ПРОГРЕСС' or ('ЭКСПЕДИЦИЯ 07 / ОПЫТ '..data.xp)
+  if modal.Visible and currentPage=='collection' then render('collection') elseif modal.Visible and currentPage=='shop' then render('shop') end
+ end
+end)
+local accum=0
+Run.RenderStepped:Connect(function(dt)
+ if previewModel and previewModel.Parent then spin=spin+dt*.4; previewModel:PivotTo(CFrame.Angles(0,spin,0)) end
+ accum=accum+dt; if accum&lt;.05 then return end; accum=0
+ target=not modal.Visible and rayTarget() or nil; selection.Adornee=target
+ targetText.Text=target and (target.Name..'  '..tostring(target:GetAttribute('HP'))..' / '..tostring(target:GetAttribute('MaxHP'))) or ''
+ if holding and not modal.Visible and target and os.clock()-lastDig&gt;.36 then lastDig=os.clock(); event:FireServer('dig',target) end
+end)
+task.spawn(function() for _=1,12 do if data then break end; event:FireServer('sync'); task.wait(1) end end)
+</ProtectedString>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="Lighting" referent="RBX14">
+    <Properties>
+      <string name="Name">Lighting</string>
+    </Properties>
+  </Item>
+  <Item class="StarterGui" referent="RBX15">
+    <Properties>
+      <string name="Name">StarterGui</string>
+    </Properties>
+  </Item>
+</roblox>
