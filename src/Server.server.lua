@@ -133,23 +133,40 @@ end
 local depleted={}
 local cleared=0
 local function totalCapacity(d) return C.Tools[d.tool].capacity end
-local function dig(p,b,auto)
+local function dig(p,b,auto,point)
  local d=state(p); local root=rootOf(p)
- if not d or not root or typeof(b)~='Instance' or not b:IsA('BasePart') or b.Parent~=blocks then return end
- if (root.Position-b.Position).Magnitude>18 then return end
+ if not d or not root or typeof(b)~='Instance' or not b:IsA('BasePart') then return end
+ local natural=b.Parent==world.Root and b.Name=='LunarRegolith'
+ if not natural and b.Parent~=blocks then return end
+ if natural then
+  if typeof(point)~='Vector3' or point.X~=point.X or point.Y~=point.Y or point.Z~=point.Z then return end
+  if (root.Position-point).Magnitude>18 then return end
+  local delta=point-b.Position
+  if math.abs(delta.X)>b.Size.X/2+.1 or math.abs(delta.Y)>b.Size.Y/2+.1 or math.abs(delta.Z)>b.Size.Z/2+.1 then return end
+ else
+  if (root.Position-b.Position).Magnitude>18 then return end
+ end
  local equipped=root.Parent:FindFirstChildOfClass('Tool')
  if not auto and (not equipped or not equipped:GetAttribute('UnderlayerTool')) then tell(p,d.tutorial.step==0 and 'Получи щётку на учебной стойке.' or 'Выбери инструмент на панели снизу: клавиша 1.'); return end
- local training=b.Position.Z<-1480
+ local training=math.abs(b.Position.X)<70 and math.abs(b.Position.Z+1560)<60
  if not training and d.tutorial.step<7 then tell(p,'Сначала заверши задания учебного отдела.'); return end
  local params=RaycastParams.new(); params.FilterType=Enum.RaycastFilterType.Exclude
  params.FilterDescendantsInstances={p.Character,petsFolder}
  local origin=root.Position+Vector3.new(0,1,0)
- local hit=workspace:Raycast(origin,b.Position-origin,params)
+ local direction=(natural and point or b.Position)-origin
+ local hit=workspace:Raycast(origin,direction.Magnitude>0 and direction.Unit*(direction.Magnitude+.2) or Vector3.new(0,-1,0),params)
  if not hit or hit.Instance~=b then return end
+ if natural then
+  if d.bag>=totalCapacity(d) then tell(p,'Рюкзак полон. Сдай добычу.'); return end
+  local center=b.Position
+  b:Destroy()
+  for _,cell in ipairs(Layout.TileCells(center.X,center.Z)) do makeBlock(cell.x,cell.z,cell.layer) end
+  return
+ end
  local layer=b:GetAttribute('Layer')
  if not training and d.bag>=totalCapacity(d) then if not auto then tell(p,'Рюкзак полон. Вернись к терминалу в лагере.') end; return end
  local hp=b:GetAttribute('HP')-(auto and 1 or C.Tools[d.tool].power)
- if hp>0 then b:SetAttribute('HP',hp); b.Color=b.Color:Lerp(Color3.fromRGB(156,175,173),.15); return end
+ if hp>0 then b:SetAttribute('HP',hp); return end
  local pos=b.Position; local find=not training and b:GetAttribute('Find'); local danger=not training and b:GetAttribute('Hazard')
  if not training then table.insert(depleted,{x=pos.X,z=pos.Z,layer=layer}) end
  b:Destroy(); if not training then cleared=cleared+1 end
@@ -294,7 +311,7 @@ local function onPlayer(p)
   if ok then u.policy=policy.ArePaidRandomItemsRestricted==false end
  end
  local function character(ch)
-  local hum=ch:WaitForChild('Humanoid'); hum.WalkSpeed=18
+  local hum=ch:WaitForChild('Humanoid'); hum.WalkSpeed=18; hum.UseJumpPower=false; hum.JumpHeight=10
   local root=ch:WaitForChild('HumanoidRootPart')
   local spawn=world.Root:FindFirstChild('CampSpawn')
   root.CFrame=s.data.tutorial.step<7 and CFrame.new(-25,5,-1560) or CFrame.new(0,5,Layout.CampZ)
@@ -321,12 +338,12 @@ Players.PlayerRemoving:Connect(function(p)
  local u=sessions[p]; if u then for _,m in ipairs(u.models) do m:Destroy() end end
  sessions[p]=nil; Profile.Live[p]=nil
 end)
-event.OnServerEvent:Connect(function(p,action,arg)
+event.OnServerEvent:Connect(function(p,action,arg,point)
  local u=sessions[p]; local d=state(p)
  if not u or not d then return end
  if action=='sync' then if os.clock()-(u.lastSync or 0)<1 then return end; u.lastSync=os.clock(); sync(p); return end
  if action=='dig' then
-  if os.clock()-u.lastDig<.32 then return end; u.lastDig=os.clock(); dig(p,arg,false); return
+  if os.clock()-u.lastDig<.32 then return end; u.lastDig=os.clock(); dig(p,arg,false,point); return
  end
  if os.clock()-u.lastAction<.4 then return end; u.lastAction=os.clock()
  if action=='home' then

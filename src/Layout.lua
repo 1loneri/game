@@ -21,12 +21,26 @@ L.Zones={
  {name='11 / Последний сигнал',x=0,z=1024},
  {name='12 / Северная экспедиция',x=768,z=1152},
 }
-function L.LayerY(layer) return L.SurfaceY-1.25-(layer-1)*2.5 end
+function L.LayerY(layer) function L.TileCells(cx,cz)
+ local cells={}
+ for ix=0,3 do for iz=0,3 do for layer=1,3 do
+  table.insert(cells,{x=cx-24+ix*16,z=cz-24+iz*16,layer=layer})
+ end end end
+ return cells
+end
+return L.SurfaceY-1.25-(layer-1)*2.5 end
 function L.InPatch(x,z,margin)
  local half=L.PatchCells*L.BlockSize/2+(margin or 0)
  for _,zone in ipairs(L.Zones) do
   if math.abs(x-zone.x)<half and math.abs(z-zone.z)<half then return true end
  end
  return false
+end
+function L.TileCells(cx,cz)
+ local cells={}
+ for ix=0,3 do for iz=0,3 do for layer=1,3 do
+  table.insert(cells,{x=cx-24+ix*16,z=cz-24+iz*16,layer=layer})
+ end end end
+ return cells
 end
 return L

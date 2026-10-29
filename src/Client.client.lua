@@ -172,7 +172,9 @@ local function sprint(on)
  if h then h.WalkSpeed=on and 30 or 18 end
 end
 local route=label(gui,UDim2.fromOffset(310,34),UDim2.fromOffset(18,124),'',12,palette.muted)
+local aimPoint=nil
 local function rayTarget()
+ aimPoint=nil
  local cam=workspace.CurrentCamera; if not cam then return nil end
  local ray
  if UIS.TouchEnabled and not UIS.MouseEnabled then ray=cam:ViewportPointToRay(cam.ViewportSize.X/2,cam.ViewportSize.Y/2)
@@ -184,7 +186,7 @@ local function rayTarget()
  local world=workspace:FindFirstChild('UnderlayerWorld'); if world and world:FindFirstChild('Companions') then table.insert(omit,world.Companions) end
  params.FilterDescendantsInstances=omit
  local result=workspace:Raycast(ray.Origin,ray.Direction*150,params)
- if result and result.Instance.Parent and result.Instance.Parent.Name=='Deposits' then return result.Instance end
+ if result and result.Instance.Parent and (result.Instance.Parent.Name=='Deposits' or result.Instance.Name=='LunarRegolith') then aimPoint=result.Position; return result.Instance end
  return nil
 end
 local selection=Instance.new('Highlight'); selection.FillColor=palette.accent; selection.FillTransparency=.84; selection.OutlineColor=palette.accent; selection.DepthMode=Enum.HighlightDepthMode.Occluded; selection.Parent=workspace.CurrentCamera
@@ -198,7 +200,7 @@ UIS.InputEnded:Connect(function(input)
  if input.KeyCode==Enum.KeyCode.LeftShift then sprint(false) end
 end)
 UIS.WindowFocusReleased:Connect(function() holding=false; sprint(false) end)
-local digButton=button(gui,UDim2.fromOffset(112,56),UDim2.new(1,-130,1,-132),'Копать',function() if not modal.Visible then local b=rayTarget(); if b then event:FireServer('dig',b) end end end)
+local digButton=button(gui,UDim2.fromOffset(112,56),UDim2.new(1,-130,1,-132),'Копать',function() if not modal.Visible then local b=rayTarget(); if b then event:FireServer('dig',b,aimPoint) end end end)
 digButton.Visible=UIS.TouchEnabled
 local toastToken=0
 local function message(txt)
@@ -247,8 +249,8 @@ Run.RenderStepped:Connect(function(dt)
   end
  end
  target=not modal.Visible and rayTarget() or nil; selection.Adornee=target
- targetText.Text=target and (target.Name..'  '..tostring(target:GetAttribute('HP'))..' / '..tostring(target:GetAttribute('MaxHP'))) or ''
- if holding and not modal.Visible and target and os.clock()-lastDig>.36 then lastDig=os.clock(); event:FireServer('dig',target) end
+ targetText.Text=target and (target.Name=='LunarRegolith' and 'Лунный грунт • можно копать' or ('Слой '..tostring(target:GetAttribute('Layer'))..' • '..tostring(target:GetAttribute('HP'))..' / '..tostring(target:GetAttribute('MaxHP')))) or ''
+ if holding and not modal.Visible and target and os.clock()-lastDig>.36 then lastDig=os.clock(); event:FireServer('dig',target,aimPoint) end
 end)
 task.spawn(function()
  for _=1,15 do if data then return end; event:FireServer('sync'); task.wait(1) end

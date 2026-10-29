@@ -38,7 +38,7 @@ function W.Build()
   return prompt
  end
  local lighting=game:GetService('Lighting')
- lighting.ClockTime=.2; lighting.Brightness=2; lighting.Ambient=Color3.fromRGB(87,91,105); lighting.OutdoorAmbient=Color3.fromRGB(115,117,126)
+ lighting.ClockTime=10.5; lighting.Brightness=1.35; lighting.ExposureCompensation=-.15; lighting.Ambient=Color3.fromRGB(55,61,73); lighting.OutdoorAmbient=Color3.fromRGB(82,86,96)
  lighting.FogColor=Color3.fromRGB(12,16,25); lighting.FogStart=1150; lighting.FogEnd=2800
  lighting.EnvironmentDiffuseScale=.3; lighting.EnvironmentSpecularScale=.2
  -- No atmospheric haze: this is an airless moon with a visible distant horizon.
@@ -147,7 +147,7 @@ function W.Build()
  for _,x in ipairs({-38,38}) do block('TrainingFrontWall',Vector3.new(56,22,3),Vector3.new(x,10,tz+58),Color3.fromRGB(83,94,103),Enum.Material.Concrete) end
  for _,x in ipairs({-50,50}) do
   local glow=block('TrainingCeilingLight',Vector3.new(1,2,80),Vector3.new(x,17,tz),Color3.fromRGB(206,220,216),Enum.Material.Neon)
-  local light=Instance.new('PointLight'); light.Color=Color3.fromRGB(213,226,221); light.Brightness=2; light.Range=60; light.Parent=glow
+  local light=Instance.new('PointLight'); light.Color=Color3.fromRGB(213,226,221); light.Brightness=.65; light.Range=48; light.Parent=glow
  end
  local function interact(name,pos,txt)
   local p=block(name,Vector3.new(7,4,4),pos,metal,Enum.Material.Metal)

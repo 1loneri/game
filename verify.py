@@ -167,3 +167,22 @@ end
 """
 execute(pets_test,'monster-models',True)
 print('PASS monsters: six species build with separate anatomy, four paws, twelve claws, eyes and larger adult forms')
+
+terrain_test=f"""
+local L=assert(loadfile('{ROOT}/src/Layout.lua'))()
+local cells=L.TileCells(32,-32); assert(#cells==48)
+local seen={{}}
+for _,cell in ipairs(cells) do
+ local key=cell.x..':'..cell.z..':'..cell.layer
+ assert(not seen[key]); seen[key]=true
+ assert(cell.x>=0 and cell.x<=64 and cell.z>=-64 and cell.z<=0)
+ assert(L.LayerY(cell.layer)-1.25>=-7.5)
+end
+"""
+execute(terrain_test,'natural-terrain-subdivision',True)
+lighting=next(i for i in root.findall('Item') if i.get('class')=='Lighting')
+assert lighting.find("Properties/string[@name='TimeOfDay']").text=='10:30:00'
+assert float(lighting.find("Properties/float[@name='Brightness']").text)<1.5
+assert "hum.JumpHeight=10" in server
+assert "point.X~=point.X" in server and "direction.Magnitude+.2" in server
+print('PASS natural ground: 48 unique layered cells above solid bedrock; daylight configuration; jump height and hit validation')
