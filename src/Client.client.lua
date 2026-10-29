@@ -8,8 +8,8 @@ local player=Players.LocalPlayer
 local F=RS:WaitForChild('Underlayer'); local C=require(F.Config); local Visual=require(F.PetVisual)
 local event=F:WaitForChild('Action'); local data=nil
 local gui=Instance.new('ScreenGui'); gui.Name='UnderlayerUI'; gui.ResetOnSpawn=false; gui.IgnoreGuiInset=false; gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling; gui.Parent=player:WaitForChild('PlayerGui')
-local palette={bg=Color3.fromRGB(18,27,35),panel=Color3.fromRGB(30,43,53),line=Color3.fromRGB(66,86,96),text=Color3.fromRGB(228,235,229),muted=Color3.fromRGB(152,173,179),accent=Color3.fromRGB(158,206,184),gold=Color3.fromRGB(226,191,126)}
-local function corner(obj,n) local c=Instance.new('UICorner'); c.CornerRadius=UDim.new(0,n or 10); c.Parent=obj end
+local palette={bg=Color3.fromRGB(20,23,28),panel=Color3.fromRGB(32,37,43),line=Color3.fromRGB(62,70,78),text=Color3.fromRGB(232,233,229),muted=Color3.fromRGB(158,166,172),accent=Color3.fromRGB(172,198,181),gold=Color3.fromRGB(226,191,126)}
+local function corner(obj,n) local c=Instance.new('UICorner'); c.CornerRadius=UDim.new(0,n or 4); c.Parent=obj end
 local function frame(parent,size,pos,color)
  local f=Instance.new('Frame'); f.Size=size; f.Position=pos; f.BackgroundColor3=color or palette.panel; f.BorderSizePixel=0; f.Parent=parent; corner(f); return f
 end
@@ -19,21 +19,25 @@ local function label(parent,size,pos,txt,n,color)
 end
 local function button(parent,size,pos,txt,callback,color)
  local b=Instance.new('TextButton'); b.Size=size; b.Position=pos; b.Text=txt; b.Font=Enum.Font.GothamBold; b.TextSize=14; b.TextColor3=palette.bg
- b.BackgroundColor3=color or palette.accent; b.AutoButtonColor=true; b.BorderSizePixel=0; b.Parent=parent; corner(b,8)
+ b.BackgroundColor3=color or palette.accent; b.AutoButtonColor=true; b.BorderSizePixel=0; b.Parent=parent; corner(b,4)
  b.Activated:Connect(callback); return b
 end
-local top=frame(gui,UDim2.new(1,-32,0,78),UDim2.fromOffset(16,12),palette.bg)
-label(top,UDim2.new(.46,0,0,30),UDim2.fromOffset(16,7),'UNDERLAYER',23,palette.accent)
-local stats=label(top,UDim2.new(.52,-16,0,36),UDim2.new(.48,0,0,7),'Загрузка экспедиции...',14)
-local levelText=label(top,UDim2.new(.6,0,0,22),UDim2.fromOffset(16,46),'ЭКСПЕДИЦИЯ 07 / ОБЩАЯ ЗОНА',11,palette.muted)
-local xpBack=frame(top,UDim2.new(.35,-16,0,5),UDim2.new(.65,0,0,58),palette.line)
+-- Compact HUD: information stays in the corners; the world remains unobstructed.
+local top=frame(gui,UDim2.fromOffset(274,102),UDim2.fromOffset(18,14),palette.bg)
+top.BackgroundTransparency=.16
+label(top,UDim2.new(1,-28,0,20),UDim2.fromOffset(14,9),'UNDERLAYER  /  07',12,palette.muted)
+local stats=label(top,UDim2.new(1,-28,0,38),UDim2.fromOffset(14,31),'Подключение к экспедиции…',14)
+local levelText=label(top,UDim2.new(1,-28,0,16),UDim2.fromOffset(14,76),'',10,palette.muted)
+local xpBack=frame(top,UDim2.new(1,-28,0,2),UDim2.fromOffset(14,96),palette.line)
 local xpBar=frame(xpBack,UDim2.fromScale(0,1),UDim2.fromScale(0,0),palette.accent)
-local toast=frame(gui,UDim2.new(.8,0,0,66),UDim2.new(.1,0,0,104),palette.bg)
-local toastText=label(toast,UDim2.new(1,-24,1,0),UDim2.fromOffset(12,0),'Очищай поверхность. Сдавай ресурсы в лагере. Найди спящих малышей.',15)
-local help=label(gui,UDim2.new(.65,0,0,52),UDim2.new(.02,0,1,-118),'ЛКМ / удерживать — раскапывать\nE у терминала — сдать • E у верстака — улучшить',13,palette.muted)
-local cross=label(gui,UDim2.fromOffset(24,24),UDim2.new(.5,-12,.5,-12),'+',24,palette.accent); cross.TextXAlignment=Enum.TextXAlignment.Center
-local targetText=label(gui,UDim2.fromOffset(300,44),UDim2.new(.5,-150,.5,20),'',13); targetText.TextXAlignment=Enum.TextXAlignment.Center
-local nav=frame(gui,UDim2.new(1,-32,0,54),UDim2.new(0,16,1,-62),palette.bg)
+local toast=frame(gui,UDim2.new(.8,0,0,48),UDim2.new(.1,0,1,-155),palette.bg)
+local toastText=label(toast,UDim2.new(1,-24,1,0),UDim2.fromOffset(12,0),'',13)
+toast.Visible=false
+local help=label(gui,UDim2.fromOffset(310,30),UDim2.new(0,18,1,-98),'ЛКМ — копать    E — взаимодействовать',11,palette.muted)
+local cross=label(gui,UDim2.fromOffset(18,18),UDim2.new(.5,-9,.5,-9),'·',24,palette.text); cross.TextXAlignment=Enum.TextXAlignment.Center
+local targetText=label(gui,UDim2.fromOffset(300,32),UDim2.new(.5,-150,.5,20),'',12); targetText.TextXAlignment=Enum.TextXAlignment.Center
+local nav=frame(gui,UDim2.fromOffset(330,40),UDim2.new(0,18,1,-60),palette.bg)
+nav.BackgroundTransparency=.12
 local modal=frame(gui,UDim2.new(.94,0,.71,0),UDim2.fromScale(.03,.19),palette.bg); modal.Visible=false
 local title=label(modal,UDim2.new(1,-80,0,48),UDim2.fromOffset(18,0),'',22,palette.accent)
 button(modal,UDim2.fromOffset(40,34),UDim2.new(1,-52,0,8),'×',function() modal.Visible=false end)
@@ -140,7 +144,10 @@ render=function(page)
  end
 end
 for i,item in ipairs({{'Малыши','collection'},{'Магазин','shop'},{'Журнал','journal'}}) do
- button(nav,UDim2.new(1/3,-12,0,38),UDim2.new((i-1)/3,6,0,8),item[1],function() if modal.Visible and currentPage==item[2] then modal.Visible=false else render(item[2]) end end)
+ button(nav,UDim2.new(1/3,-10,0,28),UDim2.new((i-1)/3,5,0,6),item[1],function() if modal.Visible and currentPage==item[2] then modal.Visible=false else render(item[2]) end end)
+end
+for _,b in ipairs(nav:GetChildren()) do
+ if b:IsA('TextButton') then b.BackgroundColor3=palette.panel; b.TextColor3=palette.text; b.TextSize=12 end
 end
 local function character(ch)
  local h=ch:WaitForChild('Humanoid')
@@ -148,7 +155,9 @@ local function character(ch)
  player.CameraMinZoomDistance=6; player.CameraMaxZoomDistance=22
  player.CameraMode=Enum.CameraMode.Classic
  task.wait(.3)
- local cam=workspace.CurrentCamera; local r=ch:FindFirstChild('HumanoidRootPart')
+ local cam=workspace.CurrentCamera
+ cam.CameraType=Enum.CameraType.Custom; cam.CameraSubject=h
+ local r=ch:FindFirstChild('HumanoidRootPart')
  if r then cam.CFrame=CFrame.lookAt(r.Position+Vector3.new(12,9,-17),r.Position+Vector3.new(0,2,0)) end
 end
 player.CharacterAdded:Connect(character); if player.Character then task.spawn(character,player.Character) end
@@ -188,10 +197,10 @@ event.OnClientEvent:Connect(function(action,payload)
  elseif action=='data' then
   data=payload
   local tool=C.Tools[data.tool]
-  stats.Text='Ур. '..data.level..'   •   '..data.coins..' монет\n'..tool.name..'   /   Рюкзак '..data.bag..' / '..tool.capacity
+  stats.Text='Уровень '..data.level..'    •    '..data.coins..' монет\n'..tool.name..'    /    '..data.bag..' из '..tool.capacity
   local floor=45*(data.level-1)^2; local ceiling=45*data.level^2
   xpBar.Size=UDim2.fromScale(math.clamp((data.xp-floor)/(ceiling-floor),0,1),1)
-  levelText.Text=data.offline and 'STUDIO / ВРЕМЕННЫЙ ПРОГРЕСС' or ('ЭКСПЕДИЦИЯ 07 / ОПЫТ '..data.xp)
+  levelText.Text=data.offline and 'Тестовый запуск • без сохранения' or ('Опыт '..data.xp)
   if modal.Visible and currentPage=='collection' then render('collection') elseif modal.Visible and currentPage=='shop' then render('shop') end
  end
 end)
@@ -203,4 +212,8 @@ Run.RenderStepped:Connect(function(dt)
  targetText.Text=target and (target.Name..'  '..tostring(target:GetAttribute('HP'))..' / '..tostring(target:GetAttribute('MaxHP'))) or ''
  if holding and not modal.Visible and target and os.clock()-lastDig>.36 then lastDig=os.clock(); event:FireServer('dig',target) end
 end)
-task.spawn(function() for _=1,12 do if data then break end; event:FireServer('sync'); task.wait(1) end end)
+task.spawn(function()
+ for _=1,15 do if data then return end; event:FireServer('sync'); task.wait(1) end
+ stats.Text='Мир загружен, сервер не отвечает'
+ message('Скрипт игры не запустился. Открой View → Output и посмотри первую красную ошибку.')
+end)

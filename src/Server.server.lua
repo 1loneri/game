@@ -6,12 +6,14 @@ local Run=game:GetService('RunService')
 local Tween=game:GetService('TweenService')
 local F=RS:WaitForChild('Underlayer')
 local C=require(F.Config); local Visual=require(F.PetVisual)
-local Profile=require(script.Parent.Profile)
+-- Visible world must never depend on persistence initialization.
 local world=require(script.Parent.World).Build()
+local Profile=require(script.Parent.Profile)
 local event=F.Action
 local rng=Random.new()
 local sessions={}
-local blocks=Instance.new('Folder'); blocks.Name='Deposits'; blocks.Parent=world.Root
+local blocks=world.Root:FindFirstChild('Deposits')
+if not blocks then blocks=Instance.new('Folder'); blocks.Name='Deposits'; blocks.Parent=world.Root end
 local petsFolder=Instance.new('Folder'); petsFolder.Name='Companions'; petsFolder.Parent=world.Root
 local function tell(p,message) if p.Parent then event:FireClient(p,'message',message) end end
 local function rootOf(p)
@@ -90,7 +92,17 @@ local function makeBlock(x,z,layer)
  b:SetAttribute('Find',rng:NextNumber()<.075)
  b.Parent=blocks
 end
-for ix=-6,6 do for iz=0,17 do for layer=1,3 do makeBlock(ix*7,iz*7,layer) end end end
+if #blocks:GetChildren()==0 then
+ for ix=-6,6 do for iz=0,17 do for layer=1,3 do makeBlock(ix*7,iz*7,layer) end end end
+else
+ for _,b in ipairs(blocks:GetChildren()) do
+  if b:IsA('BasePart') then
+   local layer=math.clamp(math.floor((4.25-b.Position.Y)/2.5+.5)+1,1,3)
+   b.Name='Слой '..layer; b:SetAttribute('Layer',layer); b:SetAttribute('HP',layer+1); b:SetAttribute('MaxHP',layer+1)
+   b:SetAttribute('Hazard',rng:NextNumber()<.085); b:SetAttribute('Find',rng:NextNumber()<.075)
+  end
+ end
+end
 local depleted={}
 local cleared=0
 local function totalCapacity(d) return C.Tools[d.tool].capacity end
@@ -201,10 +213,15 @@ local function onPlayer(p)
  if not s then sessions[p]=nil; p:Kick(err); return end
  if not p.Parent then Profile.WaitSave(p,true); Profile.Live[p]=nil; sessions[p]=nil; return end
  local u=sessions[p]
- local ok,policy=pcall(Policy.GetPolicyInfoForPlayerAsync,Policy,p)
- if ok then u.policy=policy.ArePaidRandomItemsRestricted==false end
+ -- Paid items are disabled in local Studio, so don't block gameplay on a policy request.
+ if not Run:IsStudio() then
+  local ok,policy=pcall(Policy.GetPolicyInfoForPlayerAsync,Policy,p)
+  if ok then u.policy=policy.ArePaidRandomItemsRestricted==false end
+ end
  local function character(ch)
   local hum=ch:WaitForChild('Humanoid'); hum.WalkSpeed=18
+  local root=ch:WaitForChild('HumanoidRootPart')
+  root.CFrame=CFrame.new(0,8,-45)
   hum.Died:Connect(function()
    local live=Profile.Live[p]
    if not live then return end
