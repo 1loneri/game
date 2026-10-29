@@ -133,6 +133,42 @@ function W.Build()
  -- A distant probe rewards navigation with a recognizable landmark.
  block('LostProbe',Vector3.new(9,6,9),Vector3.new(Layout.Zones[5].x,4,Layout.Zones[5].z-85),Color3.fromRGB(181,179,169),Enum.Material.Metal)
  for _,x in ipairs({-1,1}) do block('SolarPanel',Vector3.new(16,.3,9),Vector3.new(Layout.Zones[5].x+x*16,6,Layout.Zones[5].z-85),Color3.fromRGB(43,57,79),Enum.Material.Metal) end
+ -- Enclosed training room, with a shallow practice pit and a solid bottom.
+ local tz=-1560
+ block('TrainingFoundation',Vector3.new(144,8,128),Vector3.new(0,-9,tz),Color3.fromRGB(76,83,91),Enum.Material.Concrete)
+ for ix=0,15 do for iz=0,13 do
+  local x=-64+4+ix*8; local z=tz-56+4+iz*8
+  if not (x>=8 and x<40 and z>=tz-16 and z<tz+16) then
+   block('TrainingFloor',Vector3.new(8,5,8),Vector3.new(x,-2.5,z),Color3.fromRGB(118,127,133),Enum.Material.Concrete)
+  end
+ end end
+ for _,x in ipairs({-66,66}) do block('TrainingWall',Vector3.new(3,22,116),Vector3.new(x,10,tz),Color3.fromRGB(83,94,103),Enum.Material.Concrete) end
+ block('TrainingBackWall',Vector3.new(132,22,3),Vector3.new(0,10,tz-58),Color3.fromRGB(83,94,103),Enum.Material.Concrete)
+ for _,x in ipairs({-38,38}) do block('TrainingFrontWall',Vector3.new(56,22,3),Vector3.new(x,10,tz+58),Color3.fromRGB(83,94,103),Enum.Material.Concrete) end
+ for _,x in ipairs({-50,50}) do
+  local glow=block('TrainingCeilingLight',Vector3.new(1,2,80),Vector3.new(x,17,tz),Color3.fromRGB(206,220,216),Enum.Material.Neon)
+  local light=Instance.new('PointLight'); light.Color=Color3.fromRGB(213,226,221); light.Brightness=2; light.Range=60; light.Parent=glow
+ end
+ local function interact(name,pos,txt)
+  local p=block(name,Vector3.new(7,4,4),pos,metal,Enum.Material.Metal)
+  local pp=Instance.new('ProximityPrompt'); pp.Name='TeachPrompt'; pp.ActionText=txt; pp.ObjectText='Учебный отдел'; pp.MaxActivationDistance=12; pp.HoldDuration=.25; pp.Parent=p
+  local panel=block(name..'Label',Vector3.new(10,2,.3),pos+Vector3.new(0,4,0),metal,Enum.Material.Metal); sign(panel,txt)
+  return p
+ end
+ interact('TrainingRack',Vector3.new(-45,2,tz-30),'Получить инструмент')
+ interact('TrainingNest',Vector3.new(48,2,tz+4),'Осмотреть кокон')
+ interact('TrainingSell',Vector3.new(-45,2,tz+27),'Сдать учебную добычу')
+ interact('TrainingExit',Vector3.new(0,2,tz+56),'Завершить обучение')
+ local pit=block('TrainingPitMarker',Vector3.new(22,3,.4),Vector3.new(24,4,tz+20),metal,Enum.Material.Metal); sign(pit,'УЧЕБНЫЙ УЧАСТОК / ЛКМ')
+ for ix=0,3 do for iz=0,3 do for layer=1,2 do
+  local part=block('Layer'..layer,Vector3.new(8,2.5,8),Vector3.new(12+ix*8,Layout.LayerY(layer),tz-12+iz*8),layer==1 and dust or rock,Enum.Material.Sand)
+  part.Parent=deposits
+ end end end
+ local intro=block('TrainingInstructions',Vector3.new(34,8,.4),Vector3.new(-15,9,tz-55),metal,Enum.Material.Metal)
+ sign(intro,'УЧЕБНЫЙ ОТДЕЛ / 07\nПОЛУЧИ ЩЁТКУ → ОЧИСТИ УЧАСТОК → НАЙДИ КОКОН')
+ local generator=block('BaseGenerator',Vector3.new(10,6,7),Vector3.new(-52,3,cz+28),Color3.fromRGB(97,101,91),Enum.Material.Metal)
+ local repair=Instance.new('ProximityPrompt'); repair.Name='TeachPrompt'; repair.ActionText='Восстановить генератор'; repair.ObjectText='База / 80 монет'; repair.HoldDuration=1; repair.MaxActivationDistance=14; repair.Parent=generator
+ spawn.Position=Vector3.new(-25,2,tz)
  return {Root=root,Sell=prompt,Upgrade=up}
 end
 return W

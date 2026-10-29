@@ -17,7 +17,7 @@ local function copy(x)
  local y={}; for k,v in pairs(x) do y[k]=copy(v) end; return y
 end
 local function fresh()
- return {coins=0,xp=0,bag=0,tool=1,pets={Dust={growth=1,fragments=0}},equipped={'Dust'},eggs=0,receipts={}}
+ return {coins=0,xp=0,bag=0,tool=1,pets={},equipped={},tutorial={step=0,soft=0,hard=0,field=0},eggs=0,receipts={}}
 end
 function P.Load(player)
  local success, record=false,nil
@@ -31,7 +31,7 @@ function P.Load(player)
  if success and not record then return nil,'Твой профиль ещё открыт на другом сервере. Попробуй через минуту.' end
  if not success and not Run:IsStudio() then return nil,'Не удалось загрузить сохранение. Попробуй снова позже.' end
  local state={data=success and record.data or fresh(),busy=false,offline=not success,owner=owner}
- local d=state.data; d.receipts=d.receipts or {}; d.eggs=d.eggs or 0
+ local d=state.data; d.receipts=d.receipts or {}; d.eggs=d.eggs or 0; d.tutorial=d.tutorial or {step=0,soft=0,hard=0,field=0}
  P.Live[player]=state
  return state
 end

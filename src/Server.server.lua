@@ -62,6 +62,27 @@ local function refreshEntitlements(p)
  end
  sync(p); rebuild(p)
 end
+local function giveTool(p)
+ local d=state(p); if not d then return end
+ local backpack=p:FindFirstChildOfClass('Backpack'); if not backpack then return end
+ for _,container in ipairs({backpack,p.Character}) do
+  if container then for _,obj in ipairs(container:GetChildren()) do if obj:IsA('Tool') and obj:GetAttribute('UnderlayerTool') then obj:Destroy() end end end
+ end
+ local tool=Instance.new('Tool'); tool.Name=C.Tools[d.tool].name; tool.CanBeDropped=false; tool:SetAttribute('UnderlayerTool',true)
+ local handle=Instance.new('Part'); handle.Name='Handle'; handle.Size=Vector3.new(.28,2,.28); handle.Material=Enum.Material.Metal; handle.Color=Color3.fromRGB(103,119,127); handle.CanCollide=false; handle.Massless=true; handle.Parent=tool
+ local function piece(name,size,offset,color,wedge)
+  local part=Instance.new(wedge and 'WedgePart' or 'Part'); part.Name=name; part.Size=size; part.CFrame=handle.CFrame*CFrame.new(offset)
+  part.Color=color; part.Material=Enum.Material.SmoothPlastic; part.CanCollide=false; part.Massless=true; part.Parent=tool
+  local weld=Instance.new('WeldConstraint'); weld.Part0=handle; weld.Part1=part; weld.Parent=part
+ end
+ if d.tool==1 then
+  piece('BrushHead',Vector3.new(1.3,.3,.65),Vector3.new(0,1,0),Color3.fromRGB(174,143,97))
+  for i=-3,3 do piece('Bristles',Vector3.new(.12,.5,.5),Vector3.new(i*.17,1.35,0),Color3.fromRGB(64,69,73)) end
+ elseif d.tool==2 then piece('ScraperBlade',Vector3.new(1.5,.3,1),Vector3.new(0,1,0),Color3.fromRGB(191,203,208),true)
+ else piece('DrillMotor',Vector3.new(.9,.9,1.4),Vector3.new(0,.7,0),Color3.fromRGB(184,147,90)); piece('DrillTip',Vector3.new(.45,1.2,.45),Vector3.new(0,1.6,0),Color3.fromRGB(190,204,210),true) end
+ tool.Grip=CFrame.new(0,-.4,0)*CFrame.Angles(0,0,math.rad(-20)); tool.Parent=backpack
+ local h=p.Character and p.Character:FindFirstChildOfClass('Humanoid'); if h then h:EquipTool(tool) end
+end
 local hazardSerial=0
 local function hazard(position)
  hazardSerial=hazardSerial+1
@@ -116,18 +137,30 @@ local function dig(p,b,auto)
  local d=state(p); local root=rootOf(p)
  if not d or not root or typeof(b)~='Instance' or not b:IsA('BasePart') or b.Parent~=blocks then return end
  if (root.Position-b.Position).Magnitude>18 then return end
+ local equipped=root.Parent:FindFirstChildOfClass('Tool')
+ if not auto and (not equipped or not equipped:GetAttribute('UnderlayerTool')) then tell(p,d.tutorial.step==0 and 'Получи щётку на учебной стойке.' or 'Выбери инструмент на панели снизу: клавиша 1.'); return end
+ local training=b.Position.Z<-1480
+ if not training and d.tutorial.step<7 then tell(p,'Сначала заверши задания учебного отдела.'); return end
  local params=RaycastParams.new(); params.FilterType=Enum.RaycastFilterType.Exclude
  params.FilterDescendantsInstances={p.Character,petsFolder}
  local origin=root.Position+Vector3.new(0,1,0)
  local hit=workspace:Raycast(origin,b.Position-origin,params)
  if not hit or hit.Instance~=b then return end
  local layer=b:GetAttribute('Layer')
- if d.bag>=totalCapacity(d) then if not auto then tell(p,'Рюкзак полон. Вернись к терминалу в лагере.') end; return end
+ if not training and d.bag>=totalCapacity(d) then if not auto then tell(p,'Рюкзак полон. Вернись к терминалу в лагере.') end; return end
  local hp=b:GetAttribute('HP')-(auto and 1 or C.Tools[d.tool].power)
  if hp>0 then b:SetAttribute('HP',hp); b.Color=b.Color:Lerp(Color3.fromRGB(156,175,173),.15); return end
- local pos=b.Position; local find=b:GetAttribute('Find'); local danger=b:GetAttribute('Hazard')
- table.insert(depleted,{x=pos.X,z=pos.Z,layer=layer})
- b:Destroy(); cleared=cleared+1
+ local pos=b.Position; local find=not training and b:GetAttribute('Find'); local danger=not training and b:GetAttribute('Hazard')
+ if not training then table.insert(depleted,{x=pos.X,z=pos.Z,layer=layer}) end
+ b:Destroy(); if not training then cleared=cleared+1 end
+ local t=d.tutorial
+ if training and t.step==1 and layer==1 then
+  t.soft=t.soft+1; if t.soft>=3 then t.step=2; tell(p,'Пыль снята. Получи скребок на стойке.') end
+ elseif training and t.step==3 and layer==2 then
+  t.hard=t.hard+1; if t.hard>=2 then t.step=4; tell(p,'Под коркой найден кокон! Осмотри его справа от участка.') end
+ elseif not training and t.step==7 then
+  t.field=t.field+1; if t.field>=12 then t.step=8; tell(p,'Вернись к генератору базы. На ремонт нужно 80 монет.') end
+ end
  d.bag=math.min(totalCapacity(d),d.bag+3+layer*2)
  local before=C.Level(d.xp); d.xp=d.xp+5+layer*2
  local level=C.Level(d.xp)
@@ -151,7 +184,7 @@ local function dig(p,b,auto)
   local u=sessions[p]
   if os.clock()-(u.lastRebuild or 0)>5 then u.lastRebuild=os.clock(); rebuild(p) end
  end
- if cleared==90 then
+ if not training and cleared==90 then
   for _,pl in ipairs(Players:GetPlayers()) do tell(pl,'Под коркой обнаружена древняя капсула. Центральный сектор изменился.') end
   local capsule=Instance.new('Part'); capsule.Name='AncientCapsule'; capsule.Shape=Enum.PartType.Ball
   capsule.Size=Vector3.new(9,13,9); capsule.Position=Vector3.new(Layout.Zones[1].x,1,Layout.Zones[1].z); capsule.Material=Enum.Material.Neon
@@ -179,13 +212,43 @@ end
 for _,obj in ipairs(world.Root:GetDescendants()) do
  if obj:IsA('ProximityPrompt') and obj.Name=='SellPrompt' then connectDepot(obj) end
 end
+local function teach(p,obj)
+ local d=state(p); local r=rootOf(p)
+ if not d or not r or (r.Position-obj.Position).Magnitude>18 then return end
+ local t=d.tutorial
+ if obj.Name=='TrainingRack' then
+  if t.step==0 then t.step=1; tell(p,'Щётка в руках. Подойди к учебному участку и удерживай ЛКМ на пыли.')
+  elseif t.step==2 then d.tool=math.max(d.tool,2); t.step=3; tell(p,'Скребок получен. Сними 2 блока камня под пылью.') end
+  giveTool(p)
+ elseif obj.Name=='TrainingNest' then
+  if t.step~=4 then tell(p,'Сначала выполни текущее учебное задание.'); return end
+  d.pets.Dust=d.pets.Dust or {growth=1,fragments=0}; d.equipped={'Dust'}; t.step=5
+  rebuild(p); tell(p,'Это Пылик. Он растёт вместе с твоим уровнем. Теперь сдай добычу в терминале.')
+ elseif obj.Name=='TrainingSell' then
+  local amount=d.bag; d.coins=d.coins+amount*2; d.bag=0
+  if t.step==5 then t.step=6; tell(p,'Первая оплата получена. Заверши обучение у шлюза.')
+  else tell(p,'Добыча сдана. Продолжи текущее учебное задание.') end
+ elseif obj.Name=='TrainingExit' then
+  if t.step<6 then tell(p,'Выполни учебное задание перед выходом.'); return end
+  if t.step==6 then t.step=7 end
+  r.CFrame=CFrame.new(0,5,Layout.CampZ); tell(p,'База экспедиции заброшена. Очисти 12 залежей первого участка и восстанови генератор.')
+ elseif obj.Name=='BaseGenerator' then
+  if t.step~=8 then tell(p,'Сначала очисти 12 залежей экспедиции.'); return end
+  if d.coins<80 then tell(p,'На ремонт нужно 80 монет. Сдай добычу в любом пункте.'); return end
+  d.coins=d.coins-80; t.step=9; tell(p,'Генератор восстановлен. База снова принимает сигналы.')
+ end
+ sync(p)
+end
+for _,obj in ipairs(world.Root:GetDescendants()) do
+ if obj:IsA('ProximityPrompt') and obj.Name=='TeachPrompt' then obj.Triggered:Connect(function(p) teach(p,obj.Parent) end) end
+end
 world.Upgrade.Triggered:Connect(function(p)
  local d=state(p); local root=rootOf(p)
  if not d or not root or (root.Position-world.Upgrade.Parent.Position).Magnitude>16 then return end
  local nextTool=C.Tools[d.tool+1]
  if not nextTool then tell(p,'Бур уже максимального уровня.'); return end
  if d.coins<nextTool.cost then tell(p,nextTool.name..': нужно '..nextTool.cost..' монет.'); return end
- d.coins=d.coins-nextTool.cost; d.tool=d.tool+1; sync(p); tell(p,'Получен '..nextTool.name..'!')
+ d.coins=d.coins-nextTool.cost; d.tool=d.tool+1; giveTool(p); sync(p); tell(p,'Получен '..nextTool.name..'!')
 end)
 local function givePet(d,id)
  if d.pets[id] then d.pets[id].fragments=d.pets[id].fragments+1 else d.pets[id]={growth=1,fragments=0} end
@@ -234,7 +297,8 @@ local function onPlayer(p)
   local hum=ch:WaitForChild('Humanoid'); hum.WalkSpeed=18
   local root=ch:WaitForChild('HumanoidRootPart')
   local spawn=world.Root:FindFirstChild('CampSpawn')
-  root.CFrame=spawn and CFrame.new(spawn.Position+Vector3.new(0,4,0)) or CFrame.new(0,6,Layout.CampZ)
+  root.CFrame=s.data.tutorial.step<7 and CFrame.new(-25,5,-1560) or CFrame.new(0,5,Layout.CampZ)
+  if s.data.tutorial.step>0 then giveTool(p) end
   hum.Died:Connect(function()
    local live=Profile.Live[p]
    if not live then return end
@@ -265,7 +329,9 @@ event.OnServerEvent:Connect(function(p,action,arg)
   if os.clock()-u.lastDig<.32 then return end; u.lastDig=os.clock(); dig(p,arg,false); return
  end
  if os.clock()-u.lastAction<.4 then return end; u.lastAction=os.clock()
- if action=='equip' then
+ if action=='home' then
+  local r=rootOf(p); if r then r.CFrame=CFrame.new(-25,5,-1560); tell(p,'Учебный отдел. Через шлюз можно вернуться в экспедицию.') end
+ elseif action=='equip' then
   if typeof(arg)~='string' or not d.pets[arg] then return end
   local found=table.find(d.equipped,arg)
   if found then table.remove(d.equipped,found)
@@ -302,6 +368,7 @@ Run.Heartbeat:Connect(function(dt)
  for p,u in pairs(sessions) do
   local r=rootOf(p)
   if r then
+   if r.Position.Y < -35 then r.CFrame=CFrame.new(-25,5,-1560); r.AssemblyLinearVelocity=Vector3.zero; tell(p,'Аварийный возврат в учебный отдел.') end
    for i,m in ipairs(u.models) do
     if m.PrimaryPart then
      local x=(i-(#u.models+1)/2)*3

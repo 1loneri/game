@@ -1,8 +1,14 @@
 -- Minimal build-time Roblox value/Instance adapter. Not an engine simulator.
-local function vector(x,y,z) return {_type='Vector3',X=x,Y=y,Z=z} end
+local vecmt={}
+local function vector(x,y,z) return setmetatable({_type='Vector3',X=x,Y=y,Z=z},vecmt) end
+vecmt.__add=function(a,b) return vector(a.X+b.X,a.Y+b.Y,a.Z+b.Z) end
+vecmt.__mul=function(a,b) if type(a)=='number' then return vector(a*b.X,a*b.Y,a*b.Z) end; return vector(a.X*b,a.Y*b,a.Z*b) end
 Vector3={new=vector}; Vector3.zero=vector(0,0,0)
-Color3={fromRGB=function(r,g,b) return {_type='Color3',R=r/255,G=g/255,B=b/255} end}
-UDim2={fromScale=function(x,y) return {_type='UDim2',xs=x,xo=0,ys=y,yo=0} end}
+local colmt={}
+local function color(r,g,b) return setmetatable({_type='Color3',R=r,G=g,B=b},colmt) end
+colmt.__index={Lerp=function(a,b,t) return color(a.R+(b.R-a.R)*t,a.G+(b.G-a.G)*t,a.B+(b.B-a.B)*t) end}
+Color3={new=color,fromRGB=function(r,g,b) return color(r/255,g/255,b/255) end}
+UDim2={fromOffset=function(x,y) return {_type='UDim2',xs=0,xo=x,ys=0,yo=y} end,fromScale=function(x,y) return {_type='UDim2',xs=x,xo=0,ys=y,yo=0} end}
 Enum=setmetatable({},{__index=function(_,group) return setmetatable({},{__index=function(_,value) return 'Enum.'..group..'.'..value end}) end})
 local cfmt={}
 local function cf(x,y,z,r)
@@ -15,7 +21,7 @@ cfmt.__mul=function(a,b)
  end end
  return cf(a.X+ar[1]*b.X+ar[2]*b.Y+ar[3]*b.Z,a.Y+ar[4]*b.X+ar[5]*b.Y+ar[6]*b.Z,a.Z+ar[7]*b.X+ar[8]*b.Y+ar[9]*b.Z,rr)
 end
-CFrame={new=cf,Angles=function(x,y,z)
+CFrame={new=function(x,y,z) if type(x)=='table' then return cf(x.X,x.Y,x.Z) end; return cf(x,y,z) end,Angles=function(x,y,z)
  local sx,cx,sy,cy,sz,cz=math.sin(x),math.cos(x),math.sin(y),math.cos(y),math.sin(z),math.cos(z)
  return cf(0,0,0,{cy*cz,-cy*sz,sy,cx*sz+sx*sy*cz,cx*cz-sx*sy*sz,-sx*cy,sx*sz-cx*sy*cz,sx*cz+cx*sy*sz,cx*cy})
 end}

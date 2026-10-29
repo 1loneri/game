@@ -46,6 +46,9 @@ local content=Instance.new('ScrollingFrame'); content.Size=UDim2.new(1,-28,1,-64
 content.AutomaticCanvasSize=Enum.AutomaticSize.Y; content.CanvasSize=UDim2.new(); content.ScrollBarThickness=5; content.ScrollBarImageColor3=palette.accent; content.Parent=modal
 local list=Instance.new('UIListLayout'); list.Padding=UDim.new(0,10); list.SortOrder=Enum.SortOrder.LayoutOrder; list.Parent=content
 local padding=Instance.new('UIPadding'); padding.PaddingBottom=UDim.new(0,14); padding.PaddingRight=UDim.new(0,6); padding.Parent=content
+local mission=label(gui,UDim2.fromOffset(300,80),UDim2.fromOffset(18,165),'ПОЛУЧИ ЗАДАНИЕ В УЧЕБНОМ ОТДЕЛЕ',14,palette.text)
+local waypoint=Instance.new('BillboardGui'); waypoint.Size=UDim2.fromOffset(150,44); waypoint.StudsOffset=Vector3.new(0,5,0); waypoint.AlwaysOnTop=true; waypoint.MaxDistance=600; waypoint.Parent=gui
+local waypointText=label(waypoint,UDim2.fromScale(1,1),UDim2.new(),'▼ ЦЕЛЬ',14,palette.gold); waypointText.TextXAlignment=Enum.TextXAlignment.Center
 local currentPage=''; local previewStage=1
 local selectedPreview='Dust'; local previewModel=nil; local spin=0
 local products={}; local fetchPending={}
@@ -79,7 +82,7 @@ local function viewport(parent,id,growth,size,pos)
  -- Remove overhead nameplates from the 3D preview.
  for _,desc in ipairs(m:GetDescendants()) do if desc:IsA('BillboardGui') then desc:Destroy() end end
  m.Parent=world
- local camera=Instance.new('Camera'); camera.CFrame=CFrame.lookAt(Vector3.new(4,2.5,-7),Vector3.new(0,.4,0)); camera.FieldOfView=36; camera.Parent=v; v.CurrentCamera=camera
+ local camera=Instance.new('Camera'); camera.CFrame=CFrame.lookAt(Vector3.new(6,4,-11),Vector3.new(0,.6,.4)); camera.FieldOfView=40; camera.Parent=v; v.CurrentCamera=camera
  return m
 end
 local function buy(key) event:FireServer('buy',key) end
@@ -147,6 +150,7 @@ end
 for i,item in ipairs({{'Малыши','collection'},{'Магазин','shop'},{'Журнал','journal'}}) do
  button(nav,UDim2.new(1/3,-10,0,28),UDim2.new((i-1)/3,5,0,6),item[1],function() if modal.Visible and currentPage==item[2] then modal.Visible=false else render(item[2]) end end)
 end
+button(gui,UDim2.fromOffset(160,30),UDim2.new(1,-178,1,-60),'В учебный отдел',function() event:FireServer('home') end,palette.muted)
 for _,b in ipairs(nav:GetChildren()) do
  if b:IsA('TextButton') then b.BackgroundColor3=palette.panel; b.TextColor3=palette.text; b.TextSize=12 end
 end
@@ -227,7 +231,19 @@ Run.RenderStepped:Connect(function(dt)
     local n=(r.Position-Vector3.new(zone.x,0,zone.z)).Magnitude
     if n<dist then dist=n; nearest=zone end
    end
-   route.Text=nearest and (nearest.name..' • '..math.floor(dist*.28)..' м') or ''
+   local t=data and data.tutorial
+   local task=t and C.Missions[t.step]
+   local world=workspace:FindFirstChild('UnderlayerWorld')
+   local objective=world and task and world:FindFirstChild(task.target)
+   waypoint.Adornee=objective
+   if task then
+    local count=t.step==1 and (' • '..t.soft..'/3') or t.step==3 and (' • '..t.hard..'/2') or t.step==7 and (' • '..t.field..'/12') or ''
+    mission.Text='ТЕКУЩЕЕ ЗАДАНИЕ\n'..task.text..count
+   end
+   if objective then
+    local meters=math.floor((r.Position-objective.Position).Magnitude*.28)
+    route.Text='К цели: '..meters..' м'; waypointText.Text='▼ ЦЕЛЬ • '..meters..' м'
+   else route.Text=nearest and (nearest.name..' • '..math.floor(dist*.28)..' м') or '' end
   end
  end
  target=not modal.Visible and rayTarget() or nil; selection.Adornee=target

@@ -44,7 +44,7 @@ end}}
 require=function() return config end
 local profile=assert(loadfile('{ROOT}/src/Profile.lua'))()
 local function player(id) return {{UserId=id,Kick=function(self,msg) self.kicked=msg end}} end
-local p=player(10); assert(profile.Load(p)); assert(profile.Live[p].data.pets.Dust.growth==1)
+local p=player(10); assert(profile.Load(p)); assert(next(profile.Live[p].data.pets)==nil and profile.Live[p].data.tutorial.step==0)
 profile.Live[p].data.coins=123
 assert(profile.Commit(p)); assert(memory.u10.data.coins==123)
 local function receipt(d)
@@ -111,10 +111,10 @@ for part in parts:
  assert part.find("Properties/CoordinateFrame[@name='CFrame']") is not None
  assert part.find("Properties/Color3uint8[@name='Color3uint8']") is not None or part.get('class')=='SpawnLocation'
 deposits=next(i for i in world.findall('Item') if i.find("Properties/string[@name='Name']").text=='Deposits')
-assert len(deposits.findall('Item'))==2160
+assert len(deposits.findall('Item'))==2192
 server=(ROOT/'src/Server.server.lua').read_text()
 assert server.index("require(script.Parent.World).Build()")<server.index("require(script.Parent.Profile)")
-print('PASS regression: prebuilt world has',len(parts),'anchored parts, spawn, transforms and 2160 deposits; map starts before profiles')
+print('PASS regression: prebuilt world has',len(parts),'anchored parts, spawn, transforms and 2192 deposits; map starts before profiles')
 
 assert workspace.find("Item[@class='Camera']/Properties/token[@name='CameraType']").text=='5'
 print('PASS camera: default Custom mode and explicit humanoid subject on spawn')
@@ -137,6 +137,9 @@ assert len([n for n in names if n.startswith('FieldDepot')])==12
 assert names.count('HorizonMassif')==96
 assert len([n for n in names if n.startswith('CraterRim')])>300
 assert names.count('EscapeStep')==72
+assert names.count('TrainingFoundation')==1
+assert names.count('TrainingRack')==1
+assert names.count('TrainingExit')==1
 # The route out of every pit is physically empty of mineable columns.
 for part in deposits.findall('Item'):
  cf=part.find("Properties/CoordinateFrame[@name='CFrame']")
@@ -147,3 +150,20 @@ print('PASS lunar map: 3072-square plain, 12 depots, distant massifs, crater rim
 
 assert workspace.find("Properties/bool[@name='StreamingEnabled']").text=="true"
 print("PASS streaming: large-world client streaming enabled")
+
+# Run the real monster builder against the value/Instance adapter.
+adapter=(ROOT/'tools/capture_world.lua').read_text().split("script={Parent={Layout='layout'}}")[0]
+pets_test=adapter+f"""
+math.clamp=function(v,a,b) return math.max(a,math.min(b,v)) end
+local C=assert(loadfile('{ROOT}/src/Config.lua'))()
+local V=assert(loadfile('{ROOT}/src/PetVisual.lua'))()
+for id,def in pairs(C.Pets) do
+ local baby=V.Build(id,def,1); local adult=V.Build(id,def,50)
+ local names={{}}; for _,p in ipairs(baby:GetChildren()) do names[p.Name]=(names[p.Name] or 0)+1 end
+ assert(#baby:GetChildren()>=40,id..' lacks anatomical detail')
+ assert(names.Head==1 and names.Muzzle==1 and names.Paw==4 and names.Claw==12 and names.EyeWhite==2)
+ assert(adult.PrimaryPart.Size.X>baby.PrimaryPart.Size.X)
+end
+"""
+execute(pets_test,'monster-models',True)
+print('PASS monsters: six species build with separate anatomy, four paws, twelve claws, eyes and larger adult forms')
