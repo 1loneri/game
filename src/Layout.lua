@@ -7,6 +7,7 @@ L.BlockSize=16
 L.PatchCells=8
 L.Layers=3
 L.CampZ=-1240
+L.TrainingZ=-1920
 L.Zones={
  {name='01 / Тихая равнина',x=0,z=-1024},
  {name='02 / Пыльное море',x=448,z=-896},

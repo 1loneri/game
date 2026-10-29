@@ -2,6 +2,8 @@
 local vecmt={}
 local function vector(x,y,z) return setmetatable({_type='Vector3',X=x,Y=y,Z=z},vecmt) end
 vecmt.__add=function(a,b) return vector(a.X+b.X,a.Y+b.Y,a.Z+b.Z) end
+vecmt.__sub=function(a,b) return vector(a.X-b.X,a.Y-b.Y,a.Z-b.Z) end
+vecmt.__index=function(v,k) if k=='Magnitude' then return math.sqrt(v.X*v.X+v.Y*v.Y+v.Z*v.Z) end end
 vecmt.__mul=function(a,b) if type(a)=='number' then return vector(a*b.X,a*b.Y,a*b.Z) end; return vector(a.X*b,a.Y*b,a.Z*b) end
 Vector3={new=vector}; Vector3.zero=vector(0,0,0)
 local colmt={}

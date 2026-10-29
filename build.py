@@ -38,7 +38,7 @@ def item(parent,cls,name,source=None):
     if source is not None: ET.SubElement(props,'ProtectedString',{'name':'Source'}).text=source
     return el
 
-TOKENS={'Enum.Material.Slate':800,'Enum.Material.Sand':1296,'Enum.Material.Metal':1088,'Enum.Material.Concrete':816,'Enum.Material.Neon':288,'Enum.Material.Fabric':1312,'Enum.SurfaceType.Smooth':0,'Enum.PartType.Ball':0,'Enum.PartType.Block':1,'Enum.NormalId.Front':5,'Enum.Font.GothamBold':20}
+TOKENS={'Enum.Material.Slate':800,'Enum.Material.Sand':1296,'Enum.Material.Metal':1088,'Enum.Material.Concrete':816,'Enum.Material.Neon':288,'Enum.Material.Fabric':1312,'Enum.Material.SmoothPlastic':272,'Enum.Material.Glass':1568,'Enum.NormalId.Bottom':4,'Enum.SurfaceType.Smooth':0,'Enum.PartType.Ball':0,'Enum.PartType.Block':1,'Enum.NormalId.Front':5,'Enum.Font.GothamBold':20}
 
 def prop(el,name,value):
     ps=el.find('Properties')
@@ -94,12 +94,17 @@ workspace=item(root,'Workspace','Workspace')
 prop(workspace,'StreamingEnabled',True)
 for name,value in [('StreamingMinRadius',128),('StreamingTargetRadius',512)]:
     ET.SubElement(workspace.find('Properties'),'int',{'name':name}).text=str(value)
+item(workspace,'Terrain','Terrain')
 scene=capture_scene()
 world=node(workspace,scene['world'])
+# Static visuals extracted from the free, endorsed Roblox pack; scripts are absent.
+asset_file=BASE/'assets/Roblox_Station_Props.rbxmx'
+if asset_file.exists():
+    for instance in ET.parse(asset_file).getroot().findall('Item'): world.append(instance)
 rs=item(root,'ReplicatedStorage','ReplicatedStorage'); f=item(rs,'Folder','Underlayer'); item(f,'RemoteEvent','Action')
 for name in ['Config','PetVisual','Layout']: item(f,'ModuleScript',name,(BASE/'src'/f'{name}.lua').read_text())
 sss=item(root,'ServerScriptService','ServerScriptService')
-for name in ['Profile','World','Layout']: item(sss,'ModuleScript',name,(BASE/'src'/f'{name}.lua').read_text())
+for name in ['Profile','World','Layout','TerrainWorld']: item(sss,'ModuleScript',name,(BASE/'src'/f'{name}.lua').read_text())
 item(sss,'Script','UnderlayerServer',(BASE/'src/Server.server.lua').read_text())
 sp=item(root,'StarterPlayer','StarterPlayer'); prop(sp,'EnableMouseLockOption',False); sps=item(sp,'StarterPlayerScripts','StarterPlayerScripts')
 item(sps,'LocalScript','UnderlayerClient',(BASE/'src/Client.client.lua').read_text())
@@ -107,7 +112,7 @@ node(root,scene['lighting']); item(root,'StarterGui','StarterGui')
 # Initial editor camera looks from behind camp towards the excavation.
 cam=item(workspace,'Camera','Camera')
 # Build an orthonormal look-at matrix; -Z points toward target.
-eye=(340,380,-1650); target=(0,0,-1000)
+eye=(155,72,-1725); target=(0,20,-1920)
 def norm(v):
     length=math.sqrt(sum(x*x for x in v)); return tuple(x/length for x in v)
 def cross(a,b): return (a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
@@ -117,9 +122,9 @@ prop(cam,'CFrame',{'_type':'CFrame','X':eye[0],'Y':eye[1],'Z':eye[2],'R':rot})
 ET.SubElement(cam.find('Properties'),'token',{'name':'CameraType'}).text='5'
 ET.SubElement(workspace.find('Properties'),'Ref',{'name':'CurrentCamera'}).text=cam.get('referent')
 # Compact XML keeps a larger prebuilt lunar map practical to download.
-ET.ElementTree(root).write(BASE/'Underlayer.rbxlx',encoding='utf-8',xml_declaration=True)
+ET.ElementTree(root).write(BASE/'Underlayer.rbxlx',encoding='utf-8',xml_declaration=False)
 # Rojo keeps World.Build as a fallback for source-only syncs.
-project={'name':'Underlayer','tree':{'$className':'DataModel','ReplicatedStorage':{'$className':'ReplicatedStorage','Underlayer':{'$className':'Folder','Config':{'$path':'src/Config.lua'},'PetVisual':{'$path':'src/PetVisual.lua'},'Layout':{'$path':'src/Layout.lua'},'Action':{'$className':'RemoteEvent'}}},'ServerScriptService':{'$className':'ServerScriptService','UnderlayerServer':{'$path':'src/Server.server.lua'},'World':{'$path':'src/World.lua'},'Layout':{'$path':'src/Layout.lua'},'Profile':{'$path':'src/Profile.lua'}},'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':{'$className':'StarterPlayerScripts','UnderlayerClient':{'$path':'src/Client.client.lua'}}}}}
+project={'name':'Underlayer','tree':{'$className':'DataModel','ReplicatedStorage':{'$className':'ReplicatedStorage','Underlayer':{'$className':'Folder','Config':{'$path':'src/Config.lua'},'PetVisual':{'$path':'src/PetVisual.lua'},'Layout':{'$path':'src/Layout.lua'},'Action':{'$className':'RemoteEvent'}}},'ServerScriptService':{'$className':'ServerScriptService','UnderlayerServer':{'$path':'src/Server.server.lua'},'World':{'$path':'src/World.lua'},'TerrainWorld':{'$path':'src/TerrainWorld.lua'},'Layout':{'$path':'src/Layout.lua'},'Profile':{'$path':'src/Profile.lua'}},'StarterPlayer':{'$className':'StarterPlayer','StarterPlayerScripts':{'$className':'StarterPlayerScripts','UnderlayerClient':{'$path':'src/Client.client.lua'}}}}}
 (BASE/'default.project.json').write_text(json.dumps(project,indent=2))
 print('Built visible world:',sum(1 for i in world.iter('Item') if i.get('class') in ('Part','SpawnLocation')),'physical parts')
 print(BASE/'Underlayer.rbxlx')

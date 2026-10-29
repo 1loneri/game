@@ -28,6 +28,9 @@
       "World": {
         "$path": "src/World.lua"
       },
+      "TerrainWorld": {
+        "$path": "src/TerrainWorld.lua"
+      },
       "Layout": {
         "$path": "src/Layout.lua"
       },

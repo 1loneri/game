@@ -1,0 +1,351 @@
+<?xml version='1.0' encoding='utf-8'?>
+<roblox version="4"><External>null</External><External>nil</External><Item class="Folder" referent="StorePropsRoot"><Properties><string name="Name">RobloxStationProps</string></Properties><Item class="Model" referent="StoreModel1"><Properties><string name="Name">Lobby_Vent</string></Properties><Item class="MeshPart" referent="StoreMesh2"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">1088</token>
+							<string name="MeshId">rbxassetid://6963719425</string>
+							<string name="Name">Lobby_Vent</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-48.0</X><Y>24.0</Y><Z>-1981.0</Z><R00>-1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>0.0</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>11.429422118854507</X><Y>6.999999999999991</Y><Z>0.7993851906285978</Z></Vector3><Vector3 name="InitialSize"><X>3.48095703</X><Y>2.13192749</Y><Z>0.243461609</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface3"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6846493584</string>
+								<string name="MetalnessMap">rbxassetid://6710510535</string>
+								<string name="Name">Metal_Trim_B_Lite</string>
+								<string name="NormalMap">rbxassetid://6710510417</string>
+								<string name="RoughnessMap">rbxassetid://6710510306</string>
+								<string name="TexturePack">rbxassetid://6846495567</string>
+							</Properties></Item></Item></Item><Item class="Model" referent="StoreModel4"><Properties><string name="Name">Lobby_Vent</string></Properties><Item class="MeshPart" referent="StoreMesh5"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">1088</token>
+							<string name="MeshId">rbxassetid://6963719425</string>
+							<string name="Name">Lobby_Vent</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>38.0</X><Y>24.0</Y><Z>-1981.0</Z><R00>-1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>0.0</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>11.429422118854507</X><Y>6.999999999999991</Y><Z>0.7993851906285978</Z></Vector3><Vector3 name="InitialSize"><X>3.48095703</X><Y>2.13192749</Y><Z>0.243461609</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface6"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6846493584</string>
+								<string name="MetalnessMap">rbxassetid://6710510535</string>
+								<string name="Name">Metal_Trim_B_Lite</string>
+								<string name="NormalMap">rbxassetid://6710510417</string>
+								<string name="RoughnessMap">rbxassetid://6710510306</string>
+								<string name="TexturePack">rbxassetid://6846495567</string>
+							</Properties></Item></Item></Item><Item class="Model" referent="StoreModel7"><Properties><string name="Name">Energey_Cond</string></Properties><Item class="MeshPart" referent="StoreMesh8"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7084967207</string>
+							<string name="Name">Energey_Cond</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">0</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>59.0</X><Y>4.0</Y><Z>-1948.0</Z><R00>1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>-1.0</R11><R12>0.0</R12><R20>0.0</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>2.4839569741575485</X><Y>5.0</Y><Z>1.7101182604258551</Z></Vector3><Vector3 name="InitialSize"><X>3.51197863</X><Y>7.06932259</Y><Z>2.41787553</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface9"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7583446439</string>
+								<string name="MetalnessMap">rbxassetid://6740908436</string>
+								<string name="Name">Metal_Trim_A_SA</string>
+								<string name="NormalMap">rbxassetid://7583239352</string>
+								<string name="RoughnessMap">rbxassetid://6747774551</string>
+								<string name="TexturePack">rbxassetid://7583451175</string>
+							</Properties></Item></Item></Item><Item class="Model" referent="StoreModel10"><Properties><string name="Name">EmergencyKit</string></Properties><Item class="MeshPart" referent="StoreMesh11"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7163147709</string>
+							<string name="Name">EmergencyKit</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-58.0</X><Y>6.0</Y><Z>-1940.0</Z><R00>-1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>0.0</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>2.9885713972064627</X><Y>3.0000000000000013</Y><Z>0.703852405860251</Z></Vector3><Vector3 name="InitialSize"><X>3.61533737</X><Y>3.62916279</Y><Z>0.851464987</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface12"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7163155323</string>
+								<string name="MetalnessMap">rbxassetid://7163155159</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://7163155017</string>
+								<string name="RoughnessMap">rbxassetid://7163154699</string>
+								<string name="TexturePack">rbxassetid://7163161353</string>
+							</Properties></Item></Item></Item><Item class="Model" referent="StoreModel13"><Properties><string name="Name">Canister_Recharge</string></Properties><Item class="MeshPart" referent="StoreMesh14"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7070216672</string>
+							<string name="Name">Canister_Recharge</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">0</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-56.0</X><Y>5.0</Y><Z>-1900.0</Z><R00>0.0</R00><R01>1.0</R01><R02>0.0</R02><R10>1.0</R10><R11>0.0</R11><R12>0.0</R12><R20>0.0</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>5.999999999999999</X><Y>3.52256117607337</Y><Z>3.6928328170322673</Z></Vector3><Vector3 name="InitialSize"><X>5.3409729</X><Y>3.13565063</Y><Z>3.28722</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface15"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7583446439</string>
+								<string name="MetalnessMap">rbxassetid://6740908436</string>
+								<string name="Name">Metal_Trim_A_SA</string>
+								<string name="NormalMap">rbxassetid://7583239352</string>
+								<string name="RoughnessMap">rbxassetid://6747774551</string>
+								<string name="TexturePack">rbxassetid://7583451175</string>
+							</Properties></Item></Item></Item><Item class="Model" referent="StoreModel16"><Properties><string name="Name">Lobby_AC</string></Properties><Item class="MeshPart" referent="StoreMesh17"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://6966314068</string>
+							<string name="Name">Lobby_AC</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>58.0</X><Y>8.0</Y><Z>-1903.0</Z><R00>1.0</R00><R01>0.0</R01><R02>-0.0</R02><R10>0.0</R10><R11>0.0</R11><R12>1.0</R12><R20>0.0</R20><R21>-1.0</R21><R22>0.0</R22></CoordinateFrame><Vector3 name="size"><X>15.797933972904463</X><Y>1.1874096427199725</Y><Z>7.999999999999998</Z></Vector3><Vector3 name="InitialSize"><X>16.6322937</X><Y>1.25012207</Y><Z>8.42251587</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface18"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7583446439</string>
+								<string name="MetalnessMap">rbxassetid://6740908436</string>
+								<string name="Name">Metal_Trim_A_SA</string>
+								<string name="NormalMap">rbxassetid://7583239352</string>
+								<string name="RoughnessMap">rbxassetid://6747774551</string>
+								<string name="TexturePack">rbxassetid://7583451175</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh19"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://6963718997</string>
+							<string name="Name">Lobby_RoundCap</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>51.17607585107465</X><Y>8.608582243015707</Y><Z>-1902.8627770587982</Z><R00>1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>0.0</R11><R12>-1.0</R12><R20>0.0</R20><R21>1.0</R21><R22>0.0</R22></CoordinateFrame><Vector3 name="size"><X>1.0781234752366218</X><Y>0.2825093913417583</Y><Z>1.073313501515551</Z></Vector3><Vector3 name="InitialSize"><X>1.13506401</X><Y>0.297429979</Y><Z>1.13</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface20"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6718383706</string>
+								<string name="MetalnessMap">rbxassetid://6718382816</string>
+								<string name="Name">Metal_Trim_B</string>
+								<string name="NormalMap">rbxassetid://6710510417</string>
+								<string name="RoughnessMap">rbxassetid://6710510306</string>
+								<string name="TexturePack">rbxassetid://6718407508</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh21"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://6963718997</string>
+							<string name="Name">Lobby_RoundCap</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>51.17607585107465</X><Y>7.414425989083948</Y><Z>-1903.0333346477862</Z><R00>1.0</R00><R01>0.0</R01><R02>-0.0</R02><R10>0.0</R10><R11>0.0</R11><R12>1.0</R12><R20>0.0</R20><R21>-1.0</R21><R22>0.0</R22></CoordinateFrame><Vector3 name="size"><X>0.7784943422136881</X><Y>0.2039951380940526</Y><Z>0.7750211510138714</Z></Vector3><Vector3 name="InitialSize"><X>0.819610119</X><Y>0.214769036</Y><Z>0.815953493</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface22"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6718383706</string>
+								<string name="MetalnessMap">rbxassetid://6718382816</string>
+								<string name="Name">Metal_Trim_B</string>
+								<string name="NormalMap">rbxassetid://6710510417</string>
+								<string name="RoughnessMap">rbxassetid://6710510306</string>
+								<string name="TexturePack">rbxassetid://6718407508</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh23"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://6963718997</string>
+							<string name="Name">Lobby_RoundCap</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>52.48035976927165</X><Y>8.608582243015707</Y><Z>-1902.8627770587982</Z><R00>1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>0.0</R11><R12>-1.0</R12><R20>0.0</R20><R21>1.0</R21><R22>0.0</R22></CoordinateFrame><Vector3 name="size"><X>1.0781234752366218</X><Y>0.2825093913417583</Y><Z>1.073313501515551</Z></Vector3><Vector3 name="InitialSize"><X>1.13506401</X><Y>0.297429979</Y><Z>1.13</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface24"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6718383706</string>
+								<string name="MetalnessMap">rbxassetid://6718382816</string>
+								<string name="Name">Metal_Trim_B</string>
+								<string name="NormalMap">rbxassetid://6710510417</string>
+								<string name="RoughnessMap">rbxassetid://6710510306</string>
+								<string name="TexturePack">rbxassetid://6718407508</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh25"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://6963718997</string>
+							<string name="Name">Lobby_RoundCap</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>63.821797244057905</X><Y>8.020544360220956</Y><Z>-1902.8627770587982</Z><R00>1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>0.0</R11><R12>-1.0</R12><R20>0.0</R20><R21>1.0</R21><R22>0.0</R22></CoordinateFrame><Vector3 name="size"><X>1.0781234752366218</X><Y>0.2825093913417583</Y><Z>1.073313501515551</Z></Vector3><Vector3 name="InitialSize"><X>1.13506401</X><Y>0.297429979</Y><Z>1.13</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface26"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6718383706</string>
+								<string name="MetalnessMap">rbxassetid://6718382816</string>
+								<string name="Name">Metal_Trim_B</string>
+								<string name="NormalMap">rbxassetid://6710510417</string>
+								<string name="RoughnessMap">rbxassetid://6710510306</string>
+								<string name="TexturePack">rbxassetid://6718407508</string>
+							</Properties></Item></Item></Item><Item class="Model" referent="StoreModel27"><Properties><string name="Name">EmergencySuitLocker01</string></Properties><Item class="MeshPart" referent="StoreMesh28"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">1088</token>
+							<string name="MeshId">rbxassetid://7138978305</string>
+							<string name="Name">SidePanel</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-57.34122242335142</X><Y>6.324347577967986</Y><Z>-1881.043466093639</Z><R00>-1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>0.0</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>0.16673632107676228</X><Y>1.2202748058393535</Y><Z>0.0771712681208096</Z></Vector3><Vector3 name="InitialSize"><X>0.355437666</X><Y>2.60130262</Y><Z>0.1645087</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface29"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7091975626</string>
+								<string name="MetalnessMap">rbxassetid://7091975232</string>
+								<string name="Name">IntegratedShop02</string>
+								<string name="NormalMap">rbxassetid://7091975103</string>
+								<string name="RoughnessMap">rbxassetid://7091974758</string>
+								<string name="TexturePack">rbxassetid://7091979783</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh30"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813308</string>
+							<string name="Name">Top</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-55.973773382852386</X><Y>3.7649796565071543</Y><Z>-1882.192913515304</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>1.0808530682403565</X><Y>1.173125814114555</Y><Z>0.5553812183053445</Z></Vector3><Vector3 name="InitialSize"><X>2.30409241</X><Y>2.50079346</Y><Z>1.18392563</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface31"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6971357847
+</string>
+								<string name="MetalnessMap">rbxassetid://6971357648</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://6971357566</string>
+								<string name="RoughnessMap">rbxassetid://6971357457</string>
+								<string name="TexturePack">rbxassetid://11245433902</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh32"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813388</string>
+							<string name="Name">Helmet</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-55.96919232582646</X><Y>4.408898972771634</Y><Z>-1881.9665228146819</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>0.4665818524225984</X><Y>0.6315629591568563</Y><Z>0.595443649374186</Z></Vector3><Vector3 name="InitialSize"><X>0.994628906</X><Y>1.34632492</Y><Z>1.26932812</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface33"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7090893122</string>
+								<string name="MetalnessMap">rbxassetid://6532698104</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://6532696964</string>
+								<string name="RoughnessMap">rbxassetid://6532695727</string>
+								<string name="TexturePack">rbxassetid://7096246743</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh34"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813241</string>
+							<string name="Name">Bottom</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-55.973773382852386</X><Y>2.6411110510465807</Y><Z>-1882.2009447196035</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>0.7048332172277949</X><Y>1.6288437340833515</Y><Z>0.4559796311932685</Z></Vector3><Vector3 name="InitialSize"><X>1.5025177</X><Y>3.47226334</Y><Z>0.972027779</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface35"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6971341461</string>
+								<string name="MetalnessMap">rbxassetid://6971341262</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://6971341175</string>
+								<string name="RoughnessMap">rbxassetid://6971341066</string>
+								<string name="TexturePack">rbxassetid://7096242640</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh36"><Properties><Color3uint8 name="Color3uint8">4287203466</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">1088</token>
+							<string name="MeshId">rbxassetid://7061954190</string>
+							<string name="Name">WindowBase</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-56.01133813490321</X><Y>1.6809047233454608</Y><Z>-1882.1360939317121</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>1.8863172415648477</X><Y>0.6176139088389425</Y><Z>1.786943618058733</Z></Vector3><Vector3 name="InitialSize"><X>4.02112865</X><Y>1.31658924</Y><Z>3.80929041</Z></Vector3></Properties></Item><Item class="MeshPart" referent="StoreMesh37"><Properties><Color3uint8 name="Color3uint8">4294835199</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">1536</token>
+							<string name="MeshId">rbxassetid://7061954258</string>
+							<string name="Name">Window</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0.600000024</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-56.01133813490321</X><Y>3.366176125531357</Y><Z>-1882.2254247782682</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>1.7830546310787783</X><Y>4.224727370116996</Y><Z>1.8022877385321452</Z></Vector3><Vector3 name="InitialSize"><X>3.80100012</X><Y>9.00599957</Y><Z>3.84200001</Z></Vector3></Properties></Item><Item class="MeshPart" referent="StoreMesh38"><Properties><Color3uint8 name="Color3uint8">4287203466</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">1088</token>
+							<string name="MeshId">rbxassetid://7061954190</string>
+							<string name="Name">WindowBase</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-56.01145268947496</X><Y>4.9591855008109675</Y><Z>-1882.1360080392383</Z><R00>1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>-1.0</R11><R12>0.0</R12><R20>8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>1.8862568494454166</X><Y>0.6178066110196255</Y><Z>1.7868073956914685</Z></Vector3><Vector3 name="InitialSize"><X>4.02099991</X><Y>1.31700003</Y><Z>3.80900002</Z></Vector3></Properties></Item><Item class="MeshPart" referent="StoreMesh39"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813576</string>
+							<string name="Name">BackPack</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-55.9756057868987</X><Y>3.9194189214657746</Y><Z>-1882.3331514847182</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>0.5973355777022645</X><Y>0.7134048263865244</Y><Z>0.646345851358043</Z></Vector3><Vector3 name="InitialSize"><X>1.27336121</X><Y>1.5207901</Y><Z>1.37783813</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface40"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6744542826</string>
+								<string name="MetalnessMap">rbxassetid://6532702740</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://6532701667</string>
+								<string name="RoughnessMap">rbxassetid://6532700639</string>
+								<string name="TexturePack">rbxassetid://7077823964</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh41"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813018</string>
+							<string name="Name">SuitMount</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-55.97365882828065</X><Y>4.049714520402385</Y><Z>-1882.386778645368</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>0.6709046768457809</X><Y>1.1746504500878794</Y><Z>0.735736194049956</Z></Vector3><Vector3 name="InitialSize"><X>1.43019104</X><Y>2.50404358</Y><Z>1.56839466</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface42"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7583446439</string>
+								<string name="MetalnessMap">rbxassetid://6740908436</string>
+								<string name="Name">Metal_Trim_A_SA</string>
+								<string name="NormalMap">rbxassetid://7583239352</string>
+								<string name="RoughnessMap">rbxassetid://6747774551</string>
+								<string name="TexturePack">rbxassetid://7583451175</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh43"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813461</string>
+							<string name="Name">RightBoot</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-56.116244603493676</X><Y>1.5733462413631165</Y><Z>-1882.0999035061511</Z><R00>-0.893530607</R00><R01>0.0</R01><R02>-0.449002296</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>0.449002296</R20><R21>0.0</R21><R22>-0.893530607</R22></CoordinateFrame><Vector3 name="size"><X>0.3558703051089128</X><Y>0.4205099007172015</Y><Z>0.48213064373084297</Z></Vector3><Vector3 name="InitialSize"><X>0.758621216</X><Y>0.89641571</Y><Z>1.02777481</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface44"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6971263408</string>
+								<string name="MetalnessMap">rbxassetid://6971263226</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://6971262872</string>
+								<string name="RoughnessMap">rbxassetid://6971262741</string>
+								<string name="TexturePack">rbxassetid://7096244421</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh45"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813100</string>
+							<string name="Name">Gloves</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-55.973773382852386</X><Y>3.031876214543942</Y><Z>-1882.214444567764</Z><R00>-1.0</R00><R01>0.0</R01><R02>8.74227766e-08</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-8.74227766e-08</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>1.1202574156625829</X><Y>0.4419496604077921</Y><Z>0.23646814792131154</Z></Vector3><Vector3 name="InitialSize"><X>2.38809204</X><Y>0.942119598</Y><Z>0.504087448</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface46"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6971357847
+</string>
+								<string name="MetalnessMap">rbxassetid://6971357648</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://6971357566</string>
+								<string name="RoughnessMap">rbxassetid://6971357457</string>
+								<string name="TexturePack">rbxassetid://11245433902</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh47"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">256</token>
+							<string name="MeshId">rbxassetid://7077813166</string>
+							<string name="Name">LeftBoot</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-55.81744438965144</X><Y>1.5733462413631165</Y><Z>-1882.1235389476726</Z><R00>-0.85342145</R00><R01>0.0</R01><R02>0.521221399</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>-0.521221399</R20><R21>0.0</R21><R22>-0.85342145</R22></CoordinateFrame><Vector3 name="size"><X>0.37483879290887734</X><Y>0.4205099007172015</Y><Z>0.46902091393192397</Z></Vector3><Vector3 name="InitialSize"><X>0.799057007</X><Y>0.89641571</Y><Z>0.999828339</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface48"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://6971263408</string>
+								<string name="MetalnessMap">rbxassetid://6971263226</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://6971262872</string>
+								<string name="RoughnessMap">rbxassetid://6971262741</string>
+								<string name="TexturePack">rbxassetid://7096244421</string>
+							</Properties></Item></Item><Item class="MeshPart" referent="StoreMesh49"><Properties><Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+							<bool name="DoubleSided">false</bool>
+							<token name="Material">288</token>
+							<string name="MeshId">rbxassetid://7138978034</string>
+							<string name="Name">MainBody</string>
+							<float name="Reflectance">0</float>
+							<token name="RenderFidelity">1</token>
+							<string name="TextureID" />
+							<float name="Transparency">0</float>
+							<bool name="Anchored">true</bool><bool name="CanCollide">false</bool><bool name="CanQuery">false</bool><bool name="CanTouch">false</bool><bool name="CastShadow">true</bool><CoordinateFrame name="CFrame"><X>-56.0</X><Y>4.999999999999999</Y><Z>-1881.9100754630829</Z><R00>-1.0</R00><R01>0.0</R01><R02>0.0</R02><R10>0.0</R10><R11>1.0</R11><R12>0.0</R12><R20>0.0</R20><R21>0.0</R21><R22>-1.0</R22></CoordinateFrame><Vector3 name="size"><X>3.346649450878356</X><Y>8.0</Y><Z>2.073288377114072</Z></Vector3><Vector3 name="InitialSize"><X>7.13417006</X><Y>17.0538807</Y><Z>4.41970158</Z></Vector3></Properties><Item class="SurfaceAppearance" referent="StoreSurface50"><Properties><token name="AlphaMode">0</token>
+								<string name="ColorMap">rbxassetid://7141690228</string>
+								<string name="MetalnessMap">rbxassetid://7139064478</string>
+								<string name="Name">SurfaceAppearance</string>
+								<string name="NormalMap">rbxassetid://7138984238</string>
+								<string name="RoughnessMap">rbxassetid://7138984088</string>
+								<string name="TexturePack">rbxassetid://7141690728</string>
+							</Properties></Item></Item></Item></Item></roblox>
