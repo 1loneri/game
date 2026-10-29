@@ -90,12 +90,12 @@ print('PASS profile: save, receipt deduplication, release, lease collision, outa
 print('PASS regression: unpublished GetDataStore failure; default Studio avoids service acquisition; live server fails closed')
 root=ET.parse(ROOT/'Underlayer.rbxlx').getroot()
 scripts={i.find("Properties/string[@name='Name']").text:i for i in root.iter('Item') if i.get('class') in ('Script','LocalScript','ModuleScript')}
-assert len(scripts)==7
-mapping={'Config':'Config.lua','PetVisual':'PetVisual.lua','Profile':'Profile.lua','World':'World.lua','Layout':'Layout.lua','UnderlayerServer':'Server.server.lua','UnderlayerClient':'Client.client.lua'}
+assert len(scripts)==8
+mapping={'Config':'Config.lua','PetVisual':'PetVisual.lua','Profile':'Profile.lua','World':'World.lua','TerrainWorld':'TerrainWorld.lua','Layout':'Layout.lua','UnderlayerServer':'Server.server.lua','UnderlayerClient':'Client.client.lua'}
 for name,path in mapping.items():
  assert scripts[name].find("Properties/ProtectedString[@name='Source']").text==(ROOT/'src'/path).read_text()
 assert len({i.get('referent') for i in root.iter('Item')})==len(list(root.iter('Item')))
-print('PASS place: XML, seven distinct source matches, unique referents')
+print('PASS place: XML, eight distinct source matches, unique referents')
 
 workspace=next(i for i in root.findall('Item') if i.get('class')=='Workspace')
 world=workspace.find("Item/Properties/string[.='UnderlayerWorld']/../..")
@@ -181,8 +181,58 @@ end
 """
 execute(terrain_test,'natural-terrain-subdivision',True)
 lighting=next(i for i in root.findall('Item') if i.get('class')=='Lighting')
-assert lighting.find("Properties/string[@name='TimeOfDay']").text=='10:30:00'
-assert float(lighting.find("Properties/float[@name='Brightness']").text)<1.5
+assert lighting.find("Properties/string[@name='TimeOfDay']").text=='00:00:00'
+assert float(lighting.find("Properties/float[@name='Brightness']").text)==0
 assert "hum.JumpHeight=10" in server
 assert "point.X~=point.X" in server and "direction.Magnitude+.2" in server
-print('PASS natural ground: 48 unique layered cells above solid bedrock; daylight configuration; jump height and hit validation')
+print('PASS natural ground: 48 unique layered cells above solid bedrock; zero sunlight configuration; jump height and hit validation')
+
+# No freestanding text signs are serialized into the world.
+assert not any(i.get('class')=='SurfaceGui' for i in world.iter('Item'))
+assert names.count('StationDoor')==2 and names.count('StationRoofCorner')==4
+assert names.count('StationWindow')>=16
+for name in ['Ambient','OutdoorAmbient']:
+ value=lighting.find(f"Properties/Color3[@name='{name}']")
+ assert all(float(value.findtext(k))==0 for k in 'RGB')
+for name in ['EnvironmentDiffuseScale','EnvironmentSpecularScale']:
+ assert float(lighting.find(f"Properties/float[@name='{name}']").text)==0
+# Detect the exact coplanar pair class that flickered in v0.5.
+def named_boxes(name):
+ result=[]
+ for i in world.iter('Item'):
+  p=i.find('Properties')
+  if p is None or p.findtext("string[@name='Name']")!=name: continue
+  cf=p.find("CoordinateFrame[@name='CFrame']"); size=p.find("Vector3[@name='size']")
+  result.append(([float(cf.findtext(k)) for k in 'XYZ'],[float(size.findtext(k)) for k in 'XYZ']))
+ return result
+for a,sa in named_boxes('TrainingFloor'):
+ for b,sb in named_boxes('LunarRegolith')+named_boxes('OuterGroundPreview'):
+  horizontal=abs(a[0]-b[0])<(sa[0]+sb[0])/2 and abs(a[2]-b[2])<(sa[2]+sb[2])/2
+  assert not (horizontal and abs(a[1]+sa[1]/2-b[1]-sb[1]/2)<.001)
+asset=ET.parse(ROOT/'assets/Roblox_Station_Props.rbxmx').getroot()
+assert not any(i.get('class') in ['Script','LocalScript','ModuleScript','ParticleEmitter','Sound','PointLight','SpotLight'] for i in asset.iter('Item'))
+assert sum(i.get('class')=='MeshPart' for i in asset.iter('Item'))==23
+assert sum(i.get('class')=='SurfaceAppearance' for i in asset.iter('Item'))>10
+print('PASS station: chamfered roof, recessed windows, no world text boards, no ambient/sunlight, zero coplanar ground pairs, 23 sanitized Roblox mesh props')
+
+terrain_adapter=(ROOT/'tools/capture_world.lua').read_text().split("script={Parent={Layout='layout'}}")[0]
+terrain_case=terrain_adapter+f"""
+local L=assert(loadfile('{ROOT}/src/Layout.lua'))()
+local boxes={{}};local spheres=0
+workspace.Terrain={{SetMaterialColor=function() end,FillBlock=function(self,cf,size,material) table.insert(boxes,{{cf=cf,size=size,material=material}}) end,FillBall=function() spheres=spheres+1 end}}
+script={{Parent={{Layout='layout'}}}};require=function() return L end;task={{wait=function() end}}
+local flag=false;local world={{GetAttribute=function() return flag end,SetAttribute=function(self,k,v) flag=v end,GetChildren=function() return {{}} end}}
+local T=assert(loadfile('{ROOT}/src/TerrainWorld.lua'))();T.Build(world)
+assert(#boxes>100 and spheres>50 and flag)
+local generated=#boxes
+for _,b in ipairs(boxes) do
+ if b.material~='Enum.Material.Air' then
+  local x0,x1=b.cf.X-b.size.X/2,b.cf.X+b.size.X/2
+  local z0,z1=b.cf.Z-b.size.Z/2,b.cf.Z+b.size.Z/2
+  assert(x1<=-1536 or x0>=1536 or z1<=-1536 or z0>=1536)
+ end
+end
+T.Build(world);assert(#boxes==generated,'Terrain generated twice')
+"""
+execute(terrain_case,'outer-terrain',True)
+print('PASS native Terrain: bounded outer regions, protected station cutout, smooth hills and idempotent initialization')

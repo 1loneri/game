@@ -148,7 +148,7 @@ local function dig(p,b,auto,point)
  end
  local equipped=root.Parent:FindFirstChildOfClass('Tool')
  if not auto and (not equipped or not equipped:GetAttribute('UnderlayerTool')) then tell(p,d.tutorial.step==0 and 'Получи щётку на учебной стойке.' or 'Выбери инструмент на панели снизу: клавиша 1.'); return end
- local training=math.abs(b.Position.X)<70 and math.abs(b.Position.Z+1560)<60
+ local training=math.abs(b.Position.X)<70 and math.abs(b.Position.Z-Layout.TrainingZ)<60
  if not training and d.tutorial.step<7 then tell(p,'Сначала заверши задания учебного отдела.'); return end
  local params=RaycastParams.new(); params.FilterType=Enum.RaycastFilterType.Exclude
  params.FilterDescendantsInstances={p.Character,petsFolder}
@@ -313,8 +313,15 @@ local function onPlayer(p)
  local function character(ch)
   local hum=ch:WaitForChild('Humanoid'); hum.WalkSpeed=18; hum.UseJumpPower=false; hum.JumpHeight=10
   local root=ch:WaitForChild('HumanoidRootPart')
+  local head=ch:WaitForChild('Head')
+  local shell=Instance.new('Part'); shell.Name='HelmetFlashlight'; shell.Size=Vector3.new(.48,.3,.28)
+  shell.CFrame=head.CFrame*CFrame.new(0,.25,-.63); shell.Material=Enum.Material.Metal; shell.Color=Color3.fromRGB(50,58,65)
+  shell.CanCollide=false; shell.CanTouch=false; shell.Massless=true; shell.Parent=ch
+  local weld=Instance.new('WeldConstraint'); weld.Part0=head; weld.Part1=shell; weld.Parent=shell
+  local flashlight=Instance.new('SpotLight'); flashlight.Name='PersonalFlashlight'; flashlight.Face=Enum.NormalId.Front
+  flashlight.Angle=85; flashlight.Range=68; flashlight.Brightness=2.2; flashlight.Color=Color3.fromRGB(241,233,214); flashlight.Shadows=true; flashlight.Parent=shell
   local spawn=world.Root:FindFirstChild('CampSpawn')
-  root.CFrame=s.data.tutorial.step<7 and CFrame.new(-25,5,-1560) or CFrame.new(0,5,Layout.CampZ)
+  root.CFrame=s.data.tutorial.step<7 and CFrame.new(-25,5,Layout.TrainingZ) or CFrame.new(0,5,Layout.CampZ)
   if s.data.tutorial.step>0 then giveTool(p) end
   hum.Died:Connect(function()
    local live=Profile.Live[p]
@@ -347,7 +354,7 @@ event.OnServerEvent:Connect(function(p,action,arg,point)
  end
  if os.clock()-u.lastAction<.4 then return end; u.lastAction=os.clock()
  if action=='home' then
-  local r=rootOf(p); if r then r.CFrame=CFrame.new(-25,5,-1560); tell(p,'Учебный отдел. Через шлюз можно вернуться в экспедицию.') end
+  local r=rootOf(p); if r then r.CFrame=CFrame.new(-25,5,Layout.TrainingZ); tell(p,'Учебный отдел. Через шлюз можно вернуться в экспедицию.') end
  elseif action=='equip' then
   if typeof(arg)~='string' or not d.pets[arg] then return end
   local found=table.find(d.equipped,arg)
@@ -385,7 +392,7 @@ Run.Heartbeat:Connect(function(dt)
  for p,u in pairs(sessions) do
   local r=rootOf(p)
   if r then
-   if r.Position.Y < -35 then r.CFrame=CFrame.new(-25,5,-1560); r.AssemblyLinearVelocity=Vector3.zero; tell(p,'Аварийный возврат в учебный отдел.') end
+   if r.Position.Y < -35 then r.CFrame=CFrame.new(-25,5,Layout.TrainingZ); r.AssemblyLinearVelocity=Vector3.zero; tell(p,'Аварийный возврат в учебный отдел.') end
    for i,m in ipairs(u.models) do
     if m.PrimaryPart then
      local x=(i-(#u.models+1)/2)*3
@@ -435,4 +442,10 @@ game:BindToClose(function()
  local pending=0
  for p in pairs(Profile.Live) do pending=pending+1; task.spawn(function() Profile.WaitSave(p,true); pending=pending-1 end) end
  local deadline=os.clock()+25; while pending>0 and os.clock()<deadline do task.wait(.1) end
+end)
+
+-- Large landscape generation cannot block profiles, tools or the first tutorial.
+task.spawn(function()
+ local ok,err=pcall(function() require(script.Parent.TerrainWorld).Build(world.Root) end)
+ if not ok then warn("Outer landscape: ",err) end
 end)
